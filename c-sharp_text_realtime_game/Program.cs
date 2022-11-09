@@ -11,10 +11,11 @@ namespace c_sharp_realtime_game
         {
             Character Character1 = new Warrior("Simon");
             Character Character2 = new Warrior("Hector");
-            //Character Character3 = new Warrior("François");
-            //Character Character4 = new Warrior("Xavier");
+            Character Character3 = new Warrior("François");
+            Character Character4 = new Warrior("Xavier");
 
-            List<Character> Characters = new List<Character>() { Character1, Character2 };
+            //List<Character> Characters = new List<Character>() { Character1, Character2 };
+            List<Character> Characters = new List<Character>() { Character1, Character2, Character3, Character4 };
             FightManager FightManager = new FightManager(Characters);
 
             await FightManager.Start();

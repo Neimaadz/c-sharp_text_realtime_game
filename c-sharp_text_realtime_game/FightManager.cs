@@ -25,31 +25,27 @@ namespace c_sharp_realtime_game
         {
             Console.WriteLine("Start");
 
-            while (Characters.Count > 1)
+            List<Task<Character>> AttackTasks = new List<Task<Character>>();
+            foreach (Character character in Characters)
             {
-                for (int i = Characters.Count - 1; i >= 0; i--)
-                {
-                    //on stocke le personnage dans une variable pour éviter d'accéder inutilement à la liste
-                    Character currentPersonnage = Characters[i];
-                    if (currentPersonnage.CurrentLife <= 0)
-                    {
-                        Characters.Remove(currentPersonnage);
-                    }
-                }
-                if (Characters.Count == 1)
-                {
-                    Console.WriteLine("Winner is : {0}", Characters[0].Name);
-                    return;
-                }
+                AttackTasks.Add(character.Start());
+            }
 
-                List<Task> AttackTasks = new List<Task>();
-                foreach (Character character in Characters)
-                {
-                    Character target = character.Target();
-                    AttackTasks.Add(character.Attack(target));
-                }
+            while (AttackTasks.Count > 1)
+            {
+                Task<Character> CharaterDead =  await Task.WhenAny(AttackTasks);
+                AttackTasks.Remove(CharaterDead);
+            }
 
-                await Task.WhenAny(AttackTasks).Result;
+            Console.WriteLine(AttackTasks.Count);
+
+            if (AttackTasks.Count == 1)
+            {
+                Console.WriteLine("Winner is : {0}", AttackTasks[0].Result.Name);
+            }
+            foreach (Character character in Characters)
+            {
+                Console.WriteLine("{0} PV restant : {1} PV", character.Name, character.CurrentLife);
             }
 
             Console.WriteLine("Finish");
