@@ -37,8 +37,6 @@ namespace c_sharp_realtime_game
                 AttackTasks.Remove(CharaterDead);
             }
 
-            Console.WriteLine(AttackTasks.Count);
-
             if (AttackTasks.Count == 1)
             {
                 Console.WriteLine("Winner is : {0}", AttackTasks[0].Result.Name);

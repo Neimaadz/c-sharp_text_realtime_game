@@ -25,6 +25,7 @@ namespace c_sharp_realtime_game
         public FightManager fightManager;
         List<Character> TempCharacters = new List<Character>();
         public event DeathEventHandlerDelegate DeadCharacterEvent;
+        public List<int> delayBeforeNextAttacks = new List<int>();
 
         public Character(string name, int attackRate, int defenseRate, double attackSpeed, int damageRate, int maximumLife, int currentLife, double powerSpeed)
         {
@@ -59,11 +60,23 @@ namespace c_sharp_realtime_game
 
             while (CurrentLife > 0)
             {
-                int delayBeforeNextAttack = (int)((1000 / AttackSpeed) - RollDice());
-                await Task.Delay(delayBeforeNextAttack);
+                int delayNextAttack = 0;
+                int delayBeforeNextAttack = (int)((1000 / AttackSpeed) - RollDice());;
+
 
                 if (CurrentLife > 0)
                 {
+                    await Task.Run(async () =>
+                    {
+                        await Task.Delay(delayBeforeNextAttack);
+
+                        delayBeforeNextAttacks.ForEach(delay =>
+                        {
+                            delayNextAttack += delay;
+                        });
+                        Console.WriteLine("{0} delay next attaque {1}", this.Name, delayNextAttack);
+                        await Task.Delay(delayNextAttack);
+                    });
                     Attack();
 
                     // I'm the last character
@@ -118,6 +131,7 @@ namespace c_sharp_realtime_game
 
                     Console.WriteLine("{0} : -{1} PV", target.Name, damageDeal);
                     target.CurrentLife -= damageDeal;
+                    target.delayBeforeNextAttacks.Add(damageDeal + 7000);
 
                     Console.WriteLine("{0} PV restant : {1} PV", target.Name, target.CurrentLife);
                 }
