@@ -60,23 +60,10 @@ namespace c_sharp_realtime_game
 
             while (CurrentLife > 0)
             {
-                int delayNextAttack = 0;
-                int delayBeforeNextAttack = (int)((1000 / AttackSpeed) - RollDice());;
-
+                await DelayBeforeNextAttack();
 
                 if (CurrentLife > 0)
                 {
-                    await Task.Run(async () =>
-                    {
-                        await Task.Delay(delayBeforeNextAttack);
-
-                        delayBeforeNextAttacks.ForEach(delay =>
-                        {
-                            delayNextAttack += delay;
-                        });
-                        Console.WriteLine("{0} delay next attaque {1}", this.Name, delayNextAttack);
-                        await Task.Delay(delayNextAttack);
-                    });
                     Attack();
 
                     // I'm the last character
@@ -87,7 +74,6 @@ namespace c_sharp_realtime_game
                 }
             }
 
-            // I'm Dead
             fightManager.Characters.Remove(this);
 
             foreach (Character character in TempCharacters)
@@ -101,6 +87,7 @@ namespace c_sharp_realtime_game
             // Send my death event to all other characters (all listeners)
             DeadCharacterEvent?.Invoke(this, args);   // Invoke the delegate
 
+            // I'm dead
             return this;
         }
 
@@ -131,9 +118,20 @@ namespace c_sharp_realtime_game
 
                     Console.WriteLine("{0} : -{1} PV", target.Name, damageDeal);
                     target.CurrentLife -= damageDeal;
-                    target.delayBeforeNextAttacks.Add(damageDeal + 7000);
+                    target.delayBeforeNextAttacks.Add(damageDeal + 5000);
 
                     Console.WriteLine("{0} PV restant : {1} PV", target.Name, target.CurrentLife);
+
+                    if (target.CurrentLife > 0)
+                    {
+                        int delayNextAttack = 0;
+
+                        target.delayBeforeNextAttacks.ForEach(delay =>
+                        {
+                            delayNextAttack += delay;
+                        });
+                        Console.WriteLine("{0} delay next attaque {1}", target.Name, delayNextAttack);
+                    }
                 }
                 else
                 {
@@ -155,6 +153,37 @@ namespace c_sharp_realtime_game
         {
             return DefenseRate + RollDice();
         }
+
+        public async Task DelayBeforeNextAttack()
+        {
+            Task<Task> taskTask1 = new Task<Task>(async () =>
+            {
+                int delayBeforeNextAttack = (int)((1000 / AttackSpeed) - RollDice());
+                await Task.Delay(delayBeforeNextAttack);
+            });
+
+            Task<Task> taskTask2 = new Task<Task>(async () =>
+            {
+                int delayNextAttack = 0;
+
+                delayBeforeNextAttacks.ForEach(delay =>
+                {
+                    delayNextAttack += delay;
+                });
+                await Task.Delay(delayNextAttack);
+            });
+
+            Task taskParent = Task.Run(async () =>
+            {
+                taskTask1.Start(TaskScheduler.Default);
+                await taskTask1.Unwrap();
+                taskTask2.Start(TaskScheduler.Default);
+                await taskTask2.Unwrap();
+            });
+
+            await taskParent;
+        }
+
 
         // Event handler
         public void DeleteDeadCharacter(object sender, DeathEventArgs e)
