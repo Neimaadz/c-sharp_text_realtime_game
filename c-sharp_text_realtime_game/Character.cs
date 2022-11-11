@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using c_sharp_text_realtime_game;
 
-namespace c_sharp_realtime_game
+namespace c_sharp_text_realtime_game
 {
     public delegate void DeathEventHandlerDelegate(Object sender, DeathEventArgs e);
 
@@ -20,12 +20,12 @@ namespace c_sharp_realtime_game
         public int CurrentLife;
         public double PowerSpeed;
 
-        public Random random;
+        public Random Random;
         public int RandomSeed;
-        public FightManager fightManager;
+        public FightManager FightManager;
         List<Character> TempCharacters = new List<Character>();
         public event DeathEventHandlerDelegate DeadCharacterEvent;
-        public List<int> delayAttacks = new List<int>();
+        public List<int> DelayAttacks = new List<int>();
 
         public Character(string name, int attackRate, int defenseRate, double attackSpeed, int damageRate, int maximumLife, int currentLife, double powerSpeed)
         {
@@ -39,12 +39,12 @@ namespace c_sharp_realtime_game
             this.PowerSpeed = powerSpeed;
 
             RandomSeed = NameToInt() + (int)DateTime.Now.Ticks;
-            this.random = new Random(RandomSeed);
+            this.Random = new Random(RandomSeed);
         }
 
         public void SetFightManager(FightManager fightManager)
         {
-            this.fightManager = fightManager;
+            this.FightManager = fightManager;
             TempCharacters.AddRange(fightManager.Characters);
             TempCharacters.Remove(this);
         }
@@ -67,7 +67,7 @@ namespace c_sharp_realtime_game
                     Attack();
 
                     // I'm the last character
-                    if (fightManager.Characters.Count == 1)
+                    if (FightManager.Characters.Count == 1)
                     {
                         return this;
                     }
@@ -75,7 +75,7 @@ namespace c_sharp_realtime_game
             }
 
             // I'm dead
-            fightManager.Characters.Remove(this);
+            FightManager.Characters.Remove(this);
 
             foreach (Character character in TempCharacters)
             {
@@ -117,7 +117,7 @@ namespace c_sharp_realtime_game
                     int damageDeal = attackMarge * DamageRate / 100;
                     DealCommonDamage(target, damageDeal);
 
-                    target.delayAttacks.Add(damageDeal);
+                    target.DelayAttacks.Add(damageDeal);
 
                     Console.WriteLine("{0} PV restant : {1} PV", target.Name, target.CurrentLife);
                 }
@@ -148,7 +148,7 @@ namespace c_sharp_realtime_game
             {
                 int delayAttack = 0;
 
-                delayAttacks.ForEach(delay =>
+                DelayAttacks.ForEach(delay =>
                 {
                     delayAttack += delay;
                 });
@@ -173,7 +173,7 @@ namespace c_sharp_realtime_game
         }
 
         // Event handler
-        public void DeleteDeadCharacter(object sender, DeathEventArgs e)
+        public virtual void DeleteDeadCharacter(object sender, DeathEventArgs e)
         {
             Console.WriteLine("{0} : {1} est mort", this.Name, e.DeadCharacter.Name);
             TempCharacters.Remove(e.DeadCharacter);
@@ -190,9 +190,9 @@ namespace c_sharp_realtime_game
             // On cree une liste dans laquelle on stockera les cibles valides
             List<Character> validTarget = new List<Character>();
 
-            for (int i = 0; i < fightManager.Characters.Count; i++)
+            for (int i = 0; i < FightManager.Characters.Count; i++)
             {
-                Character currentCharacter = fightManager.Characters[i];
+                Character currentCharacter = FightManager.Characters[i];
                 // Si le personnage testé n'est pas celui qui attaque et qu'il est vivant
                 if (currentCharacter != this && currentCharacter.CurrentLife > 0)
                 {
@@ -204,28 +204,30 @@ namespace c_sharp_realtime_game
             if (validTarget.Count > 0)
             {
                 // On prend un personnage au hasard dans la liste des cibles valides et on le designe comme la cible de l'attaque 
-                Character target = validTarget[random.Next(0, validTarget.Count)];
+                Character target = validTarget[Random.Next(0, validTarget.Count)];
                 return target;
             }
             return null;
         }
+
         private int AttackMarge(Character target)
         {
-            return target.DefenseRoll() - AttackRoll();
+            return AttackRoll() - target.DefenseRoll();
         }
 
-        public int AttackRoll()
+        private int AttackRoll()
         {
             return AttackRate + RollDice();
         }
-        public int DefenseRoll()
+
+        private int DefenseRoll()
         {
             return DefenseRate + RollDice();
         }
 
         private int RollDice()
         {
-            return random.Next(1, 101);
+            return Random.Next(1, 101);
         }
 
         private int NameToInt()

@@ -2,7 +2,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace c_sharp_text_realtime_game.Characters
+namespace c_sharp_text_realtime_game
 {
     public class Zombie : Undead
     {
@@ -12,8 +12,19 @@ namespace c_sharp_text_realtime_game.Characters
 
         public override Task<Task> DamageTakenDelayAttack()
         {
-            return null;
+            return new Task<Task>(async () =>
+            {
+                DelayAttacks.Clear();
+                await Task.Delay(0);
+            });
         }
+
+        public override void DeleteDeadCharacter(object sender, DeathEventArgs e)
+        {
+            base.DeleteDeadCharacter(sender, e);
+            EatDeadCharacter(e.DeadCharacter);
+        }
+
         public void EatDeadCharacter(Character target)
         {
             Console.WriteLine("{0} : mange le cadavre de {1}", Name, target.Name);
