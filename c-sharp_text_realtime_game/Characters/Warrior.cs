@@ -14,16 +14,20 @@ namespace c_sharp_text_realtime_game
          */
         public override async Task SpecialSpell()
         {
-            //await IncreaseAttackSpeed();
+            await IncreaseAttackSpeed();
         }
 
-        public async Task IncreaseAttackSpeed()
+        public Task IncreaseAttackSpeed()
         {
-            Console.WriteLine("{0} : augmente sa vitesse d'attaque de 0,5", this.Name);
-            this.AttackSpeed += 0.5;
-            Console.WriteLine("{0} : vitesse d'attaque {1}", this.Name, this.AttackSpeed);
-            await Task.Delay(3000);
-            this.AttackSpeed -= 0.5;
+            _ = Task.Factory.StartNew(async () =>
+            {
+                Console.WriteLine("{0} : augmente sa vitesse d'attaque de 0,5", Name);
+                AttackSpeed += 0.5;
+                Console.WriteLine("{0} : vitesse d'attaque {1}", Name, AttackSpeed);
+                await Task.Delay(3000);
+                AttackSpeed -= 0.5;
+            }).ConfigureAwait(false);
+            return Task.CompletedTask;
         }
     }
 }

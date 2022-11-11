@@ -58,13 +58,7 @@ namespace c_sharp_text_realtime_game
             while (CurrentLife > 0 && FightManager.Characters.Count > 1)
             {
                 await DamageTakenDelayTask();
-                await DelayDefaultAttackTask();
-
-                if (CurrentLife > 0)
-                {
-                    Attack();
-                    await SpecialSpell();
-                }
+                await Task.WhenAny(DelayDefaultAttackTask(), DelaySpecialSpellTask());
             }
 
             // I'm dead
@@ -102,6 +96,14 @@ namespace c_sharp_text_realtime_game
             {
                 Console.WriteLine("{0} Attaque", this.Name, target.Name);
 
+                /*Console.WriteLine("{0} : vitesse d'attaque {1}", Name, AttackSpeed);
+                int test = 0;
+                DelayAttacks.ForEach(delay =>
+                {
+                    test += delay;
+                });
+                Console.WriteLine("{0} : delay attack {1}", Name, test);*/
+
                 int attackMarge = AttackMarge(target);
 
                 if (attackMarge > 0)
@@ -132,6 +134,11 @@ namespace c_sharp_text_realtime_game
 
             return Task.Run(async () =>
             {
+                if (CurrentLife > 0)
+                {
+                    Attack();
+                }
+
                 delayAttack.Start(TaskScheduler.Default);
                 await delayAttack.Unwrap();
             });
@@ -142,6 +149,11 @@ namespace c_sharp_text_realtime_game
 
             return Task.Run(async () =>
             {
+                if (CurrentLife > 0)
+                {
+                    await SpecialSpell();
+                }
+
                 delaySpecialSpell.Start(TaskScheduler.Default);
                 await delaySpecialSpell.Unwrap();
             });

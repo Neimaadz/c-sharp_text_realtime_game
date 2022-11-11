@@ -14,11 +14,14 @@ namespace c_sharp_text_realtime_game
             Character Character4 = new Warrior("Xavier");
             Character Character5 = new Zombie("Azouma");
             Character Character6 = new Zombie("Mazimo");
+            Character Character7 = new Zombie("Rzemo");
+            Character Character8 = new Zombie("Traxi");
 
             //List<Character> Characters = new List<Character>() { Character1, Character2 };
             //List<Character> Characters = new List<Character>() { Character1, Character2, Character3, Character4 };
             List<Character> Characters = new List<Character>() {
-                Character1, Character2, Character3, Character4, Character5, Character6
+                Character1, Character2, Character3, Character4,
+                Character5, Character6, Character7, Character8
             };
             FightManager FightManager = new FightManager(Characters);
 
