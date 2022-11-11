@@ -3,11 +3,12 @@ using System.Threading.Tasks;
 
 namespace c_sharp_text_realtime_game
 {
-    public class Warrior : Character
+    public class Warrior : Character, IAlive
     {
         public Warrior(string name) : base (name, 150, 105, 2.2, 150, 250, 250, 0.2)
         {
         }
+
 
         /*
          * POUVOIR : augmente la vitesse d’attaque de 0,5 pendant 3 secondes.

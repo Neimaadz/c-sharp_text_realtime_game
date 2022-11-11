@@ -96,14 +96,6 @@ namespace c_sharp_text_realtime_game
             {
                 Console.WriteLine("{0} Attaque", this.Name, target.Name);
 
-                /*Console.WriteLine("{0} : vitesse d'attaque {1}", Name, AttackSpeed);
-                int test = 0;
-                DelayAttacks.ForEach(delay =>
-                {
-                    test += delay;
-                });
-                Console.WriteLine("{0} : delay attack {1}", Name, test);*/
-
                 int attackMarge = AttackMarge(target);
 
                 if (attackMarge > 0)
@@ -230,17 +222,17 @@ namespace c_sharp_text_realtime_game
             return null;
         }
 
-        private int AttackMarge(Character target)
+        protected int AttackMarge(Character target)
         {
             return AttackRoll() - target.DefenseRoll();
         }
 
-        private int AttackRoll()
+        protected virtual int AttackRoll()
         {
             return AttackRate + RollDice();
         }
 
-        private int DefenseRoll()
+        protected virtual int DefenseRoll()
         {
             return DefenseRate + RollDice();
         }

@@ -11,6 +11,7 @@ namespace c_sharp_text_realtime_game
         {
         }
 
+
         /*
          * POUVOIR : Dévore l’un des cadavres sur le champ de bataille. Se soigne de maximumLife du
          * cadavre choisi. Un cadavre ne peut être dévoré qu’une fois
