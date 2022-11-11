@@ -197,7 +197,7 @@ namespace c_sharp_text_realtime_game
 
 
         // Selectionner une cible valide
-        public Character Target()
+        public virtual Character Target()
         {
             // On cree une liste dans laquelle on stockera les cibles valides
             List<Character> validTarget = new List<Character>();
@@ -208,7 +208,7 @@ namespace c_sharp_text_realtime_game
                 // Si le personnage testé n'est pas celui qui attaque et qu'il est vivant
                 if (currentCharacter != this && currentCharacter.CurrentLife > 0)
                 {
-                    //on l'ajoute à la liste des cible valide
+                    // On l'ajoute à la liste des cible valide
                     validTarget.Add(currentCharacter);
                 }
             }

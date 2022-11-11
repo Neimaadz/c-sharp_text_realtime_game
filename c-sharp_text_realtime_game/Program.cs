@@ -11,7 +11,7 @@ namespace c_sharp_text_realtime_game
             Character Character1 = new Warrior("Simon");
             Character Character2 = new Warrior("Hector");
             Character Character3 = new Warrior("François");
-            Character Character4 = new Warrior("Xavier");
+            Character Character4 = new Priest("Xavier");
             Character Character5 = new Zombie("Azouma");
             Character Character6 = new Zombie("Mazimo");
             Character Character7 = new Robot("Robocop");

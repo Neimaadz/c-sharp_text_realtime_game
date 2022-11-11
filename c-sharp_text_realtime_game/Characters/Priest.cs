@@ -1,0 +1,105 @@
+﻿using c_sharp_text_realtime_game.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace c_sharp_text_realtime_game
+{
+    public class Priest : Character, IAlive, IHolyDamage
+    {
+        string IHolyDamage.Name { get => Name; set => Name = value; }
+        public Priest(string name) : base(name, 100, 125, 1.5, 90, 150, 150, 1)
+        {
+        }
+
+
+        public override Task SpecialSpell()
+        {
+            Heal();
+            return Task.CompletedTask;
+        }
+
+        public override void Attack()
+        {
+            Character target = Target();
+
+            if (target != null)
+            {
+                Console.WriteLine("{0} Attaque", this.Name, target.Name);
+
+                int attackMarge = AttackMarge(target);
+
+                if (attackMarge > 0)
+                {
+                    int damageDeal = attackMarge * DamageRate / 100;
+                    (this as IHolyDamage).DealHolyDamage(target, damageDeal);
+
+                    target.DelayAttacks.Add(damageDeal);
+
+                    Console.WriteLine("{0} PV restant : {1} PV", target.Name, target.CurrentLife);
+                }
+                else
+                {
+                    Console.WriteLine("{0} : Echec de l'attaque !", this.Name);
+                }
+            }
+        }
+
+        private void Heal()
+        {
+            int heal = (int)(MaximumLife * 0.1);
+            CurrentLife += heal;
+            Console.WriteLine("{0} se soigne", Name);
+            Console.WriteLine("{0} : +{1} PDV", Name, heal);
+
+            // Pour caper la vie
+            if (CurrentLife >= MaximumLife)
+            {
+                CurrentLife = MaximumLife;
+            }
+        }
+
+        public override Character Target()
+        {
+            List<Character> validTarget = new List<Character>();
+            List<Character> undeadCharacters = new List<Character>();
+
+            for (int i = 0; i < FightManager.Characters.Count; i++)
+            {
+                Character currentCharacter = FightManager.Characters[i];
+
+                if (currentCharacter != this && currentCharacter.CurrentLife > 0)
+                {
+                    validTarget.Add(currentCharacter);
+                }
+            }
+
+            if (validTarget.Count > 0)
+            {
+                for (int i = 0; i < validTarget.Count; i++)
+                {
+                    // S'il y a un Mort-vivant parmi la liste des cibles valides
+                    if (validTarget[i] is Undead)
+                    {
+                        // On l'ajoute dans la liste
+                        undeadCharacters.Add(validTarget[i]);
+                    }
+                }
+
+                if (undeadCharacters.Count > 0)
+                {
+                    Character target = undeadCharacters[Random.Next(0, undeadCharacters.Count)];
+                    return target;
+                }
+                else
+                {
+                    // On prend un personnage au hasard dans la liste des cibles valides et on le designe comme la cible de l'attaque 
+                    Character target = validTarget[Random.Next(0, validTarget.Count)];
+                    return target;
+                }
+            }
+            return null;
+        }
+    }
+}

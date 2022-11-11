@@ -75,6 +75,12 @@ namespace c_sharp_text_realtime_game
                 int damageSteal = (int)(damageDeal * 0.5);
                 this.CurrentLife += damageSteal;
                 Console.WriteLine("{0} vol de vie : +{1} PV", this.Name, damageSteal);
+
+                // Pour caper la vie
+                if (CurrentLife >= MaximumLife)
+                {
+                    CurrentLife = MaximumLife;
+                }
             }
         }
     }
