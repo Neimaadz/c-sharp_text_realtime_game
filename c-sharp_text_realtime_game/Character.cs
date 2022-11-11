@@ -25,7 +25,7 @@ namespace c_sharp_realtime_game
         public FightManager fightManager;
         List<Character> TempCharacters = new List<Character>();
         public event DeathEventHandlerDelegate DeadCharacterEvent;
-        public List<int> delayBeforeNextAttacks = new List<int>();
+        public List<int> delayAttacks = new List<int>();
 
         public Character(string name, int attackRate, int defenseRate, double attackSpeed, int damageRate, int maximumLife, int currentLife, double powerSpeed)
         {
@@ -60,7 +60,7 @@ namespace c_sharp_realtime_game
 
             while (CurrentLife > 0)
             {
-                await DelayBeforeNextAttack();
+                await DelayAttack();
 
                 if (CurrentLife > 0)
                 {
@@ -74,6 +74,7 @@ namespace c_sharp_realtime_game
                 }
             }
 
+            // I'm dead
             fightManager.Characters.Remove(this);
 
             foreach (Character character in TempCharacters)
@@ -87,7 +88,6 @@ namespace c_sharp_realtime_game
             // Send my death event to all other characters (all listeners)
             DeadCharacterEvent?.Invoke(this, args);   // Invoke the delegate
 
-            // I'm dead
             return this;
         }
 
@@ -115,10 +115,9 @@ namespace c_sharp_realtime_game
                 if (attackMarge > 0)
                 {
                     int damageDeal = attackMarge * DamageRate / 100;
+                    DealCommonDamage(target, damageDeal);
 
-                    Console.WriteLine("{0} : -{1} PV", target.Name, damageDeal);
-                    target.CurrentLife -= damageDeal;
-                    target.delayBeforeNextAttacks.Add(damageDeal);
+                    target.delayAttacks.Add(damageDeal);
 
                     Console.WriteLine("{0} PV restant : {1} PV", target.Name, target.CurrentLife);
                 }
@@ -128,51 +127,50 @@ namespace c_sharp_realtime_game
                 }
             }
         }
-
-        private int AttackMarge(Character target)
+        public static void DealCommonDamage(Character target, int damageDeal)
         {
-            return target.DefenseRoll() - AttackRoll();
+            Console.WriteLine("{0} : -{1} PDV", target.Name, damageDeal);
+            target.CurrentLife -= damageDeal;
         }
 
-        public int AttackRoll()
+        public virtual Task<Task> DefaultDelayAttack()
         {
-            return AttackRate + RollDice();
-        }
-        public int DefenseRoll()
-        {
-            return DefenseRate + RollDice();
-        }
-
-        public async Task DelayBeforeNextAttack()
-        {
-            Task<Task> taskTask1 = new Task<Task>(async () =>
+            return new Task<Task>(async () =>
             {
-                int delayBeforeNextAttack = (int)((1000 / AttackSpeed) - RollDice());
-                await Task.Delay(delayBeforeNextAttack);
+                int delayAttack = (int)((1000 / AttackSpeed) - RollDice());
+                await Task.Delay(delayAttack);
             });
+        }
 
-            Task<Task> taskTask2 = new Task<Task>(async () =>
+        public virtual Task<Task> DamageTakenDelayAttack()
+        {
+            return new Task<Task>(async () =>
             {
-                int delayNextAttack = 0;
+                int delayAttack = 0;
 
-                delayBeforeNextAttacks.ForEach(delay =>
+                delayAttacks.ForEach(delay =>
                 {
-                    delayNextAttack += delay;
+                    delayAttack += delay;
                 });
-                await Task.Delay(delayNextAttack);
+                await Task.Delay(delayAttack);
             });
+        }
+
+        public async Task DelayAttack()
+        {
+            Task<Task> defaultDelayAttacks = DefaultDelayAttack();
+            Task<Task> damageTakenDelayAttacks = DamageTakenDelayAttack();
 
             Task taskParent = Task.Run(async () =>
             {
-                taskTask1.Start(TaskScheduler.Default);
-                await taskTask1.Unwrap();
-                taskTask2.Start(TaskScheduler.Default);
-                await taskTask2.Unwrap();
+                defaultDelayAttacks.Start(TaskScheduler.Default);
+                await defaultDelayAttacks.Unwrap();
+                damageTakenDelayAttacks.Start(TaskScheduler.Default);
+                await damageTakenDelayAttacks.Unwrap();
             });
 
             await taskParent;
         }
-
 
         // Event handler
         public void DeleteDeadCharacter(object sender, DeathEventArgs e)
@@ -180,6 +178,8 @@ namespace c_sharp_realtime_game
             Console.WriteLine("{0} : {1} est mort", this.Name, e.DeadCharacter.Name);
             TempCharacters.Remove(e.DeadCharacter);
         }
+
+
 
 
 
@@ -208,6 +208,19 @@ namespace c_sharp_realtime_game
                 return target;
             }
             return null;
+        }
+        private int AttackMarge(Character target)
+        {
+            return target.DefenseRoll() - AttackRoll();
+        }
+
+        public int AttackRoll()
+        {
+            return AttackRate + RollDice();
+        }
+        public int DefenseRoll()
+        {
+            return DefenseRate + RollDice();
         }
 
         private int RollDice()
