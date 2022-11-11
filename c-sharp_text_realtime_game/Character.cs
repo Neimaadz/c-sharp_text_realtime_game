@@ -118,20 +118,9 @@ namespace c_sharp_realtime_game
 
                     Console.WriteLine("{0} : -{1} PV", target.Name, damageDeal);
                     target.CurrentLife -= damageDeal;
-                    target.delayBeforeNextAttacks.Add(damageDeal + 5000);
+                    target.delayBeforeNextAttacks.Add(damageDeal);
 
                     Console.WriteLine("{0} PV restant : {1} PV", target.Name, target.CurrentLife);
-
-                    if (target.CurrentLife > 0)
-                    {
-                        int delayNextAttack = 0;
-
-                        target.delayBeforeNextAttacks.ForEach(delay =>
-                        {
-                            delayNextAttack += delay;
-                        });
-                        Console.WriteLine("{0} delay next attaque {1}", target.Name, delayNextAttack);
-                    }
                 }
                 else
                 {
