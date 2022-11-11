@@ -22,24 +22,21 @@ namespace c_sharp_text_realtime_game
         {
             Console.WriteLine("Start");
 
-            List<Task<Character>> AttackTasks = new List<Task<Character>>();
+            List<Task<Character>> attackTasks = new List<Task<Character>>();
             foreach (Character character in Characters)
             {
-                AttackTasks.Add(character.Start());
+                attackTasks.Add(character.Start());
             }
 
-            while (AttackTasks.Count > 1)
+            while (attackTasks.Count > 1)
             {
-                Task<Character> CharaterDead =  await Task.WhenAny(AttackTasks);
-                AttackTasks.Remove(CharaterDead);
+                Task<Character> CharaterDead =  await Task.WhenAny(attackTasks);
+                attackTasks.Remove(CharaterDead);
             }
 
-            if (AttackTasks.Count == 1)
-            {
-                Console.WriteLine("Winner is : {0}", AttackTasks[0].Result.Name);
-            }
             foreach (Character character in Characters)
             {
+                Console.WriteLine("Winner is : {0}", character.Name);
                 Console.WriteLine("{0} PV restant : {1} PV", character.Name, character.CurrentLife);
             }
 

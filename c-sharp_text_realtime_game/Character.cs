@@ -55,19 +55,15 @@ namespace c_sharp_text_realtime_game
                 character.DeadCharacterEvent += DeleteDeadCharacter;
             }
 
-            while (CurrentLife > 0)
+            while (CurrentLife > 0 && FightManager.Characters.Count > 1)
             {
-                await DelayAttack();
+                await DamageTakenDelayTask();
+                await DelayDefaultAttackTask();
 
                 if (CurrentLife > 0)
                 {
                     Attack();
-
-                    // I'm the last character
-                    if (FightManager.Characters.Count == 1)
-                    {
-                        return this;
-                    }
+                    await SpecialSpell();
                 }
             }
 
@@ -88,15 +84,14 @@ namespace c_sharp_text_realtime_game
             return this;
         }
 
-
-        virtual public void SpecialSpell()
+        virtual public void Passive()
         {
 
         }
 
-        virtual public void Passive()
+        virtual public Task SpecialSpell()
         {
-
+            return Task.CompletedTask;
         }
 
         virtual public void Attack()
@@ -124,17 +119,49 @@ namespace c_sharp_text_realtime_game
                 }
             }
         }
+
         public static void DealCommonDamage(Character target, int damageDeal)
         {
             Console.WriteLine("{0} : -{1} PDV", target.Name, damageDeal);
             target.CurrentLife -= damageDeal;
         }
 
-        public virtual Task<Task> DefaultDelayAttack()
+        public Task DelayDefaultAttackTask()
+        {
+            Task<Task> delayAttack = DelayAttack(AttackSpeed);
+
+            return Task.Run(async () =>
+            {
+                delayAttack.Start(TaskScheduler.Default);
+                await delayAttack.Unwrap();
+            });
+        }
+        public Task DelaySpecialSpellTask()
+        {
+            Task<Task> delaySpecialSpell = DelayAttack(PowerSpeed);
+
+            return Task.Run(async () =>
+            {
+                delaySpecialSpell.Start(TaskScheduler.Default);
+                await delaySpecialSpell.Unwrap();
+            });
+        }
+        public Task DamageTakenDelayTask()
+        {
+            Task<Task> damageTakenDelayAttack = DamageTakenDelayAttack();
+
+            return Task.Run(async () =>
+            {
+                damageTakenDelayAttack.Start(TaskScheduler.Default);
+                await damageTakenDelayAttack.Unwrap();
+            });
+        }
+
+        public Task<Task> DelayAttack(double speed)
         {
             return new Task<Task>(async () =>
             {
-                int delayAttack = (int)((1000 / AttackSpeed) - RollDice());
+                int delayAttack = (int)((1000 / speed) - RollDice());
                 await Task.Delay(delayAttack);
             });
         }
@@ -151,22 +178,6 @@ namespace c_sharp_text_realtime_game
                 });
                 await Task.Delay(delayAttack);
             });
-        }
-
-        public async Task DelayAttack()
-        {
-            Task<Task> defaultDelayAttacks = DefaultDelayAttack();
-            Task<Task> damageTakenDelayAttacks = DamageTakenDelayAttack();
-
-            Task taskParent = Task.Run(async () =>
-            {
-                defaultDelayAttacks.Start(TaskScheduler.Default);
-                await defaultDelayAttacks.Unwrap();
-                damageTakenDelayAttacks.Start(TaskScheduler.Default);
-                await damageTakenDelayAttacks.Unwrap();
-            });
-
-            await taskParent;
         }
 
         // Event handler
