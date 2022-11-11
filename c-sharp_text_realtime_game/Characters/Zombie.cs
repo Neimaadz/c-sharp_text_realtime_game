@@ -1,5 +1,4 @@
-﻿using c_sharp_realtime_game;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 
 namespace c_sharp_text_realtime_game
