@@ -15,6 +15,7 @@ namespace c_sharp_text_realtime_game
             Character Character5 = new Priest("Simon");
             Character Character6 = new Assassin("Connor");
             Character Character7 = new Alchimist("Singed");
+            Character Character8 = new Necromancer("Gromoun");
 
 
             Character Character11 = new Zombie("Mazimo");
@@ -26,7 +27,7 @@ namespace c_sharp_text_realtime_game
             //List<Character> Characters = new List<Character>() { Character1, Character2 };
             List<Character> Characters = new List<Character>() {
                 Character1, Character2, Character3, Character4,
-                Character5, Character6, Character7
+                Character5, Character6, Character7, Character8
             };
             FightManager FightManager = new FightManager(Characters);
 

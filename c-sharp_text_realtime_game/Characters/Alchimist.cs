@@ -10,6 +10,7 @@ namespace c_sharp_text_realtime_game
     {
         string IHolyDamage.Name { get => Name; set => Name = value; }
         string IPoisoning.Name { get => Name; set => Name = value; }
+
         public Alchimist(string name) : base(name, 50, 50, 1, 30, 150, 150, 0.1)
         {
         }
@@ -17,7 +18,11 @@ namespace c_sharp_text_realtime_game
         public override void SpecialSpell()
         {
             Character characterHighestCurrentLife = FightManager.Characters.OrderByDescending(x => x.CurrentLife).First();
+            int currentLife = this.CurrentLife;
             this.CurrentLife = characterHighestCurrentLife.CurrentLife;
+            characterHighestCurrentLife.CurrentLife = currentLife;
+
+            Console.WriteLine("{0} Echange sa vie avec {1}", this.Name, characterHighestCurrentLife.Name);
 
             // Pour caper la vie
             if (this.CurrentLife >= this.MaximumLife)

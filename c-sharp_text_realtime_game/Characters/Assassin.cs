@@ -9,6 +9,7 @@ namespace c_sharp_text_realtime_game
     public class Assassin : Character, IPoisoning
     {
         string IPoisoning.Name { get => Name; set => Name = value; }
+
         public Assassin(string name) : base(name, 150, 100, 1, 100, 185, 185, 0.5)
         {
         }
@@ -33,6 +34,7 @@ namespace c_sharp_text_realtime_game
                 {
                     int damageDeal = attackMarge * this.DamageRate / 100;
 
+                    // Coup Critique
                     if (damageDeal > (target.CurrentLife / 2))
                     {
                         Console.WriteLine("{0} Coup critique !", this.Name);
