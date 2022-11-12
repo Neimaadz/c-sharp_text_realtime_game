@@ -19,10 +19,9 @@ namespace c_sharp_text_realtime_game
          * POUVOIR : Sélectionne une cible aléatoire et augmente son délai d’attaque du montant de dégâts que
          * le vampire a reçu depuis la dernière utilisation de son pouvoir.
          */
-        public override Task SpecialSpell()
+        public override void SpecialSpell()
         {
             IncreaseTargetDelayAttack();
-            return Task.CompletedTask;
         }
 
         public override void Attack()
@@ -37,8 +36,8 @@ namespace c_sharp_text_realtime_game
 
                 if (attackMarge > 0)
                 {
-                    int damageDeal = attackMarge * DamageRate / 100;
-                    DealCommonDamage(target, damageDeal);
+                    int damageDeal = attackMarge * this.DamageRate / 100;
+                    DealCommonDamage(target, damageDeal, 1);
 
                     StealLife(target, damageDeal);
 
@@ -77,9 +76,9 @@ namespace c_sharp_text_realtime_game
                 Console.WriteLine("{0} vol de vie : +{1} PV", this.Name, damageSteal);
 
                 // Pour caper la vie
-                if (CurrentLife >= MaximumLife)
+                if (this.CurrentLife >= this.MaximumLife)
                 {
-                    CurrentLife = MaximumLife;
+                    this.CurrentLife = this.MaximumLife;
                 }
             }
         }

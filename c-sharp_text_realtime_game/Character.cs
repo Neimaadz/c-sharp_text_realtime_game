@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace c_sharp_text_realtime_game
 {
@@ -23,6 +24,9 @@ namespace c_sharp_text_realtime_game
         List<Character> TempCharacters = new List<Character>();
         public event DeathEventHandlerDelegate DeadCharacterEvent;
         public List<int> DelayAttacks = new List<int>();
+        public List<int> PoisonDamages = new List<int>();
+        public bool IsSpecialSpellAvailable = true;
+        Timer SpecialSpellTimer = new Timer();
 
         public Character(string name, int attackRate, int defenseRate, double attackSpeed, int damageRate, int maximumLife, int currentLife, double powerSpeed)
         {
@@ -37,6 +41,7 @@ namespace c_sharp_text_realtime_game
 
             RandomSeed = NameToInt() + (int)DateTime.Now.Ticks;
             this.Random = new Random(RandomSeed);
+            SpecialSpellTimer.Elapsed += SpecialSpellEvent;
         }
 
         public void SetFightManager(FightManager fightManager)
@@ -46,8 +51,6 @@ namespace c_sharp_text_realtime_game
             TempCharacters.Remove(this);
         }
 
-
-
         public async Task<Character> Start()
         {
             foreach (Character character in TempCharacters)
@@ -55,14 +58,13 @@ namespace c_sharp_text_realtime_game
                 character.DeadCharacterEvent += DeleteDeadCharacter;
             }
 
-            while (CurrentLife > 0 && FightManager.Characters.Count > 1)
+            PoisonEventTimer(5000);
+
+            while (this.CurrentLife > 0 && FightManager.Characters.Count > 1)
             {
                 await DamageTakenDelayTask();
-                await Task.WhenAny(DelayDefaultAttackTask(), DelaySpecialSpellTask());
+                await DefaultAttackTask();
             }
-
-            // I'm dead
-            FightManager.Characters.Remove(this);
 
             foreach (Character character in TempCharacters)
             {
@@ -73,7 +75,7 @@ namespace c_sharp_text_realtime_game
             args.DeadCharacter = this;
 
             // Send my death event to all other characters (all listeners)
-            DeadCharacterEvent?.Invoke(this, args);   // Invoke the delegate
+            this.DeadCharacterEvent?.Invoke(this, args);   // Invoke the delegate
 
             return this;
         }
@@ -83,9 +85,8 @@ namespace c_sharp_text_realtime_game
 
         }
 
-        virtual public Task SpecialSpell()
+        virtual public void SpecialSpell()
         {
-            return Task.CompletedTask;
         }
 
         virtual public void Attack()
@@ -100,8 +101,8 @@ namespace c_sharp_text_realtime_game
 
                 if (attackMarge > 0)
                 {
-                    int damageDeal = attackMarge * DamageRate / 100;
-                    DealCommonDamage(target, damageDeal);
+                    int damageDeal = attackMarge * this.DamageRate / 100;
+                    DealCommonDamage(target, damageDeal, 1);
 
                     target.DelayAttacks.Add(damageDeal);
 
@@ -114,45 +115,18 @@ namespace c_sharp_text_realtime_game
             }
         }
 
-        public static void DealCommonDamage(Character target, int damageDeal)
+        public virtual Task DamageTakenDelayTask()
         {
-            Console.WriteLine("{0} : -{1} PDV", target.Name, damageDeal);
-            target.CurrentLife -= damageDeal;
-        }
-
-        public Task DelayDefaultAttackTask()
-        {
-            Task<Task> delayAttack = DelayAttack(AttackSpeed);
-
-            return Task.Run(async () =>
+            Task<Task> damageTakenDelayAttack = new Task<Task>(async () =>
             {
-                if (CurrentLife > 0)
+                int delayAttack = 0;
+
+                this.DelayAttacks.ForEach(delay =>
                 {
-                    Attack();
-                }
-
-                delayAttack.Start(TaskScheduler.Default);
-                await delayAttack.Unwrap();
-            });
-        }
-        public Task DelaySpecialSpellTask()
-        {
-            Task<Task> delaySpecialSpell = DelayAttack(PowerSpeed);
-
-            return Task.Run(async () =>
-            {
-                if (CurrentLife > 0)
-                {
-                    await SpecialSpell();
-                }
-
-                delaySpecialSpell.Start(TaskScheduler.Default);
-                await delaySpecialSpell.Unwrap();
-            });
-        }
-        public Task DamageTakenDelayTask()
-        {
-            Task<Task> damageTakenDelayAttack = DamageTakenDelayAttack();
+                    delayAttack += delay;
+                });
+                await Task.Delay(delayAttack);
+            }); ;
 
             return Task.Run(async () =>
             {
@@ -161,34 +135,85 @@ namespace c_sharp_text_realtime_game
             });
         }
 
-        public Task<Task> DelayAttack(double speed)
+        public Task DefaultAttackTask()
         {
-            return new Task<Task>(async () =>
+            Task<Task> delayAttack = new Task<Task>(async () =>
             {
-                int delayAttack = (int)((1000 / speed) - RollDice());
-                await Task.Delay(delayAttack);
+                await Task.Delay(DelayAttack(this.AttackSpeed));
+            });
+            
+            return Task.Run(async () =>
+            {
+                delayAttack.Start(TaskScheduler.Default);
+                await delayAttack.Unwrap();
+
+                if (this.CurrentLife > 0)
+                {
+                    Attack();
+
+                    if (this.IsSpecialSpellAvailable)
+                    {
+                        SpecialSpell();
+                        SpecialSpellEventTimer();
+                    }
+                }
             });
         }
-
-        public virtual Task<Task> DamageTakenDelayAttack()
+        public void SpecialSpellEventTimer()
         {
-            return new Task<Task>(async () =>
-            {
-                int delayAttack = 0;
+            SpecialSpellTimer.Enabled = false;
+            SpecialSpellTimer.Interval = DelayAttack(this.PowerSpeed);
+            SpecialSpellTimer.Enabled = true;
+            this.IsSpecialSpellAvailable = false;
+        }
 
-                DelayAttacks.ForEach(delay =>
-                {
-                    delayAttack += delay;
-                });
-                await Task.Delay(delayAttack);
+        public void SpecialSpellEvent(object source, ElapsedEventArgs e)
+        {
+            this.IsSpecialSpellAvailable = true;
+        }
+
+        public void PoisonEventTimer (int interval)
+        {
+            Timer poisonEventTimer = new Timer();
+            poisonEventTimer.Elapsed += PoisonEvent;
+            poisonEventTimer.Interval = interval;
+            poisonEventTimer.Enabled = true;
+        }
+
+        private void PoisonEvent(object source, ElapsedEventArgs e)
+        {
+            int poisonDamage = 0;
+
+            this.PoisonDamages.ForEach(poison =>
+            {
+                poisonDamage += poison;
             });
+
+            if (poisonDamage > 0)
+            {
+                Console.WriteLine("{0} : {1} PDV", this.Name, this.CurrentLife);
+                Console.WriteLine("{0} : empoisonnement", this.Name);
+                Console.WriteLine("{0} : -{1} PDV", this.Name, poisonDamage);
+
+                this.CurrentLife -= poisonDamage;
+            }
         }
 
         // Event handler
         public virtual void DeleteDeadCharacter(object sender, DeathEventArgs e)
         {
             Console.WriteLine("{0} : {1} est mort", this.Name, e.DeadCharacter.Name);
-            TempCharacters.Remove(e.DeadCharacter);
+
+            // Delete the dead target
+            FightManager.Characters.Remove(e.DeadCharacter);
+        }
+
+        public static void DealCommonDamage(Character target, int damageDeal, double rate)
+        {
+            int damage = (int)(damageDeal * rate);
+            Console.WriteLine("{0} : -{1} PDV", target.Name, damageDeal);
+
+            target.CurrentLife -= damage;
         }
 
 
@@ -202,9 +227,9 @@ namespace c_sharp_text_realtime_game
             // On cree une liste dans laquelle on stockera les cibles valides
             List<Character> validTarget = new List<Character>();
 
-            for (int i = 0; i < FightManager.Characters.Count; i++)
+            for (int i = 0; i < this.TempCharacters.Count; i++)
             {
-                Character currentCharacter = FightManager.Characters[i];
+                Character currentCharacter = this.TempCharacters[i];
                 // Si le personnage testé n'est pas celui qui attaque et qu'il est vivant
                 if (currentCharacter != this && currentCharacter.CurrentLife > 0)
                 {
@@ -216,12 +241,15 @@ namespace c_sharp_text_realtime_game
             if (validTarget.Count > 0)
             {
                 // On prend un personnage au hasard dans la liste des cibles valides et on le designe comme la cible de l'attaque 
-                Character target = validTarget[Random.Next(0, validTarget.Count)];
+                Character target = validTarget[this.Random.Next(0, validTarget.Count)];
                 return target;
             }
             return null;
         }
-
+        public int DelayAttack(double speed)
+        {
+            return (int)((1000 / speed) - RollDice());
+        }
         protected int AttackMarge(Character target)
         {
             return AttackRoll() - target.DefenseRoll();
@@ -229,17 +257,17 @@ namespace c_sharp_text_realtime_game
 
         protected virtual int AttackRoll()
         {
-            return AttackRate + RollDice();
+            return this.AttackRate + RollDice();
         }
 
         protected virtual int DefenseRoll()
         {
-            return DefenseRate + RollDice();
+            return this.DefenseRate + RollDice();
         }
 
         private int RollDice()
         {
-            return Random.Next(1, 101);
+            return this.Random.Next(1, 101);
         }
 
         private int NameToInt()

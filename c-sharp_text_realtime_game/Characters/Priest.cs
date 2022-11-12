@@ -13,11 +13,12 @@ namespace c_sharp_text_realtime_game
         {
         }
 
-
-        public override Task SpecialSpell()
+        /*
+         * POUVOIR :se soigne de 10% de sa vie maximum
+         */
+        public override void SpecialSpell()
         {
             Heal();
-            return Task.CompletedTask;
         }
 
         public override void Attack()
@@ -48,26 +49,30 @@ namespace c_sharp_text_realtime_game
 
         private void Heal()
         {
-            int heal = (int)(MaximumLife * 0.1);
-            CurrentLife += heal;
-            Console.WriteLine("{0} se soigne", Name);
-            Console.WriteLine("{0} : +{1} PDV", Name, heal);
+            int heal = (int)(this.MaximumLife * 0.1);
+            this.CurrentLife += heal;
+            Console.WriteLine("{0} se soigne", this.Name);
+            Console.WriteLine("{0} : +{1} PDV", this.Name, heal);
 
             // Pour caper la vie
-            if (CurrentLife >= MaximumLife)
+            if (this.CurrentLife >= this.MaximumLife)
             {
-                CurrentLife = MaximumLife;
+                this.CurrentLife = this.MaximumLife;
             }
         }
 
+        /*
+         * PASSIF : Inflige des dégâts sacrés. S’il y a des morts-vivants parmi les combattants,
+         * le prêtre les cible en priorité.
+         */
         public override Character Target()
         {
             List<Character> validTarget = new List<Character>();
             List<Character> undeadCharacters = new List<Character>();
 
-            for (int i = 0; i < FightManager.Characters.Count; i++)
+            for (int i = 0; i < this.FightManager.Characters.Count; i++)
             {
-                Character currentCharacter = FightManager.Characters[i];
+                Character currentCharacter = this.FightManager.Characters[i];
 
                 if (currentCharacter != this && currentCharacter.CurrentLife > 0)
                 {
@@ -89,13 +94,13 @@ namespace c_sharp_text_realtime_game
 
                 if (undeadCharacters.Count > 0)
                 {
-                    Character target = undeadCharacters[Random.Next(0, undeadCharacters.Count)];
+                    Character target = undeadCharacters[this.Random.Next(0, undeadCharacters.Count)];
                     return target;
                 }
                 else
                 {
                     // On prend un personnage au hasard dans la liste des cibles valides et on le designe comme la cible de l'attaque 
-                    Character target = validTarget[Random.Next(0, validTarget.Count)];
+                    Character target = validTarget[this.Random.Next(0, validTarget.Count)];
                     return target;
                 }
             }

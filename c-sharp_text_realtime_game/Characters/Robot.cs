@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace c_sharp_text_realtime_game
 {
-    public class Robot :Character, INotAlive
+    public class Robot :Character
     {
         public Robot(string name) : base(name, 25, 100, 1.2, 50, 275, 275, 0.5)
         {
@@ -15,16 +15,15 @@ namespace c_sharp_text_realtime_game
         /*
          * POUVOIR : A chaque utilisation de son pouvoir, le robot augmente son attaque de 50%.
          */
-        public override Task SpecialSpell()
+        public override void SpecialSpell()
         {
             IncreaseAttackRate();
-            return Task.CompletedTask;
         }
         public void IncreaseAttackRate()
         {
-            Console.WriteLine("{0} : augmente son attaque de 50%", Name);
-            AttackRate += (int)(AttackRate * 0.5);
-            Console.WriteLine("{0} : taux d'attaque {1}", Name, AttackRate);
+            Console.WriteLine("{0} : augmente son attaque de 50%", this.Name);
+            this.AttackRate += (int)(this.AttackRate * 0.5);
+            Console.WriteLine("{0} : taux d'attaque {1}", this.Name, this.AttackRate);
         }
 
         /*
@@ -34,12 +33,12 @@ namespace c_sharp_text_realtime_game
          */
         protected override int AttackRoll()
         {
-            return AttackRate + 50;
+            return this.AttackRate + 50;
         }
 
         protected override int DefenseRoll()
         {
-            return DefenseRate + 50;
+            return this.DefenseRate + 50;
         }
     }
 }

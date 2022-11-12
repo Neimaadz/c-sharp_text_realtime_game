@@ -16,39 +16,44 @@ namespace c_sharp_text_realtime_game
          * POUVOIR : Dévore l’un des cadavres sur le champ de bataille. Se soigne de maximumLife du
          * cadavre choisi. Un cadavre ne peut être dévoré qu’une fois
          */
-        public override Task SpecialSpell()
+        public override void SpecialSpell()
         {
-            if (ToEatDeadCharacters.Count > 0)
+            if (this.ToEatDeadCharacters.Count > 0)
             {
-                Character characterToEat = ToEatDeadCharacters[Random.Next(0, ToEatDeadCharacters.Count)];
+                Character characterToEat = ToEatDeadCharacters[Random.Next(0, this.ToEatDeadCharacters.Count)];
                 EatDeadCharacter(characterToEat);
             }
-            return Task.CompletedTask;
         }
 
         /*
          * PASSIF : Ne subit jamais de délai d’attaque. Jet de défense toujours égal à 0
          */
-        public override Task<Task> DamageTakenDelayAttack()
+        public override Task DamageTakenDelayTask()
         {
-            return new Task<Task>(async () =>
+            Task<Task> damageTakenDelayAttack = new Task<Task>(async () =>
             {
-                DelayAttacks.Clear();
+                this.DelayAttacks.Clear();
                 await Task.Delay(0);
+            }); ;
+
+            return Task.Run(async () =>
+            {
+                damageTakenDelayAttack.Start(TaskScheduler.Default);
+                await damageTakenDelayAttack.Unwrap();
             });
         }
 
         public override void DeleteDeadCharacter(object sender, DeathEventArgs e)
         {
             base.DeleteDeadCharacter(sender, e);
-            ToEatDeadCharacters.Add(e.DeadCharacter);
+            this.ToEatDeadCharacters.Add(e.DeadCharacter);
         }
 
         public void EatDeadCharacter(Character target)
         {
-            Console.WriteLine("{0} : mange le cadavre de {1}", Name, target.Name);
-            CurrentLife += target.MaximumLife;
-            ToEatDeadCharacters.Remove(target);
+            Console.WriteLine("{0} : mange le cadavre de {1}", this.Name, target.Name);
+            this.CurrentLife += target.MaximumLife;
+            this.ToEatDeadCharacters.Remove(target);
         }
     }
 }

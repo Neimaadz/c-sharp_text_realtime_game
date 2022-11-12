@@ -3,12 +3,14 @@ namespace c_sharp_text_realtime_game.Interfaces
 {
     public interface IPoisoning
     {
-        public void PoisonDamage(Character target)
+        public string Name { get; set; }
+        public void DealPoisonDamage(Character target, int damageDeal, double rate)
         {
-            if (!(target is Undead))
-            {
-                // target.PoisonRates.Add(10);
-            }
+            int poisonDamage = (int)(damageDeal * rate);
+            Console.WriteLine("{0} : empoisone {1}", this.Name, target.Name);
+            Console.WriteLine("{0} : -{1} PDV", target.Name, poisonDamage);
+
+            target.PoisonDamages.Add(poisonDamage);
         }
     }
 }

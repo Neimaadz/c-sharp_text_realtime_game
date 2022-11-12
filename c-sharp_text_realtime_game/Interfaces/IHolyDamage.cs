@@ -10,11 +10,11 @@ namespace c_sharp_text_realtime_game.Interfaces
             if (target is Undead)
             {
                 Console.WriteLine("{0} inflige des dégats sacrés", Name);
-                Character.DealCommonDamage(target, damageDeal * 2); // dégats communs x2
+                Character.DealCommonDamage(target, damageDeal * 2, 1); // dégats communs x2
             }
             else
             {
-                Character.DealCommonDamage(target, damageDeal);
+                Character.DealCommonDamage(target, damageDeal, 1);
             }
         }
     }
