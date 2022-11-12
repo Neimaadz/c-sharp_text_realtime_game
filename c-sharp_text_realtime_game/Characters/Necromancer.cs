@@ -42,6 +42,7 @@ namespace c_sharp_text_realtime_game
         public override void DeleteDeadCharacter(object sender, DeathEventArgs e)
         {
             base.DeleteDeadCharacter(sender, e);
+            Console.WriteLine("{0} : renforcement !", this.Name);
             this.AttackRate += 5;
             this.DefenseRate += 5;
             this.DamageRate += 5;

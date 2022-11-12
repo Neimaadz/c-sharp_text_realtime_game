@@ -23,6 +23,8 @@ namespace c_sharp_text_realtime_game
             Character Character13 = new Robot("Cyborki");
             Character Character14 = new Assassin("Artham");
             Character Character15 = new Assassin("Blake");
+            Character Character16 = new Alchimist("Ivyness");
+            Character Character17 = new Necromancer("Granmerkal");
 
             //List<Character> Characters = new List<Character>() { Character1, Character2 };
             List<Character> Characters = new List<Character>() {
