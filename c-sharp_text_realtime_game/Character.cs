@@ -80,11 +80,6 @@ namespace c_sharp_text_realtime_game
             return this;
         }
 
-        virtual public void Passive()
-        {
-
-        }
-
         virtual public void SpecialSpell()
         {
         }
@@ -265,7 +260,7 @@ namespace c_sharp_text_realtime_game
             return this.DefenseRate + RollDice();
         }
 
-        private int RollDice()
+        protected virtual int RollDice()
         {
             return this.Random.Next(1, 101);
         }

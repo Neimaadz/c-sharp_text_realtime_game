@@ -16,6 +16,7 @@ namespace c_sharp_text_realtime_game
 
         public override void SpecialSpell()
         {
+            // TODO
         }
 
         public override void Attack()

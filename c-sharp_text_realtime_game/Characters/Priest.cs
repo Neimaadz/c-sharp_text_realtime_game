@@ -34,7 +34,7 @@ namespace c_sharp_text_realtime_game
                 if (attackMarge > 0)
                 {
                     int damageDeal = attackMarge * DamageRate / 100;
-                    (this as IHolyDamage).DealHolyDamage(target, damageDeal);
+                    (this as IHolyDamage).DealHolyDamage(target, damageDeal, 1);
 
                     target.DelayAttacks.Add(damageDeal);
 
