@@ -11,6 +11,7 @@ namespace c_sharp_text_realtime_game
         public bool IsCamouflaged { get; set; }
         public Timer CamouflagedTimer { get; set; }
         public List<Character> Characters { get; set; }
+        public ConsoleColor Color { get; set; }
 
 
 
@@ -18,7 +19,7 @@ namespace c_sharp_text_realtime_game
         {
             if (IsCamouflaged == false && this.Characters.Count > 5)
             {
-                Console.WriteLine("{0} se camoufle", this.Name);
+                Character.MyLog(this.Name + " se camoufle", Color);
                 IsCamouflaged = true;
             }
             CamouflagedEventTimer();
@@ -35,7 +36,7 @@ namespace c_sharp_text_realtime_game
             CamouflagedTimer.Elapsed -= CamouflagedEvent;
             if (IsCamouflaged)
             {
-                Console.WriteLine("{0} perd son camouflage", this.Name);
+                Character.MyLog(this.Name + " perd son camouflage", Color);
                 IsCamouflaged = false;
             }
         }

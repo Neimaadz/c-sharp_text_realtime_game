@@ -18,6 +18,7 @@ namespace c_sharp_text_realtime_game
         public int MaximumLife;
         public int CurrentLife;
         public double PowerSpeed;
+        public ConsoleColor Color { get; set; }
 
         public Random Random;
         public int RandomSeed;
@@ -30,7 +31,7 @@ namespace c_sharp_text_realtime_game
         Timer SpecialSpellTimer = new Timer();
         public event ReamainingCharactersEventHandlerDelegate ReamainingCharactersEvent;
 
-        public Character(string name, int attackRate, int defenseRate, double attackSpeed, int damageRate, int maximumLife, int currentLife, double powerSpeed)
+        public Character(string name, int attackRate, int defenseRate, double attackSpeed, int damageRate, int maximumLife, int currentLife, double powerSpeed, ConsoleColor color = ConsoleColor.White)
         {
             this.Name = name;
             this.AttackRate = attackRate;
@@ -40,6 +41,7 @@ namespace c_sharp_text_realtime_game
             this.MaximumLife = maximumLife;
             this.CurrentLife = currentLife;
             this.PowerSpeed = powerSpeed;
+            this.Color = color;
 
             RandomSeed = NameToInt() + (int)DateTime.Now.Ticks;
             this.Random = new Random(RandomSeed);
@@ -111,7 +113,7 @@ namespace c_sharp_text_realtime_game
 
             if (target != null)
             {
-                Console.WriteLine("{0} Attaque", this.Name, target.Name);
+                MyLog(this.Name + " : Attaque " + target.Name);
 
                 int attackMarge = AttackMarge(target);
 
@@ -122,11 +124,11 @@ namespace c_sharp_text_realtime_game
 
                     target.DelayAttacks.Add(damageDeal);
 
-                    Console.WriteLine("{0} PV restant : {1} PV", target.Name, target.CurrentLife);
+                    MyLog(target.Name + " PV restant : " +  target.CurrentLife + " PV");
                 }
                 else
                 {
-                    Console.WriteLine("{0} : Echec de l'attaque !", this.Name);
+                    MyLog(this.Name + " : Echec de l'attaque !");
                 }
             }
         }
@@ -207,8 +209,8 @@ namespace c_sharp_text_realtime_game
 
             if (poisonDamage > 0)
             {
-                Console.WriteLine("{0} : empoisonnement", this.Name);
-                Console.WriteLine("{0} : -{1} PDV", this.Name, poisonDamage);
+                MyLog(this.Name + " : Empoisonement");
+                MyLog(this.Name + " : -" + poisonDamage + " PDV");
 
                 this.CurrentLife -= poisonDamage;
             }
@@ -217,7 +219,7 @@ namespace c_sharp_text_realtime_game
         // Event handler
         public virtual void DeleteDeadCharacter(object sender, DeathEventArgs e)
         {
-            Console.WriteLine("{0} : {1} est mort", this.Name, e.DeadCharacter.Name);
+            MyLog(this.Name + " : " + e.DeadCharacter.Name + " est mort");
 
             // Delete the dead target
             this.FightManager.Characters.Remove(e.DeadCharacter);
@@ -225,7 +227,7 @@ namespace c_sharp_text_realtime_game
 
         public virtual void RemainingCharacters(object sender, RemainingCharactersEventArgs e)
         {
-            Console.WriteLine("{0} : Il reste 5 combattans en vie", this.Name);
+            MyLog(this.Name + " :  Il reste 5 combattans en vie");
         }
 
 
@@ -237,10 +239,10 @@ namespace c_sharp_text_realtime_game
 
 
 
-        public static void DealCommonDamage(Character target, int damageDeal, double rate)
+        public void DealCommonDamage(Character target, int damageDeal, double rate)
         {
             int damage = (int)(damageDeal * rate);
-            Console.WriteLine("{0} : -{1} PDV", target.Name, damageDeal);
+            MyLog(target.Name + " : -" + damage + " PDV");
 
             target.CurrentLife -= damage;
         }
@@ -318,6 +320,18 @@ namespace c_sharp_text_realtime_game
                 result += c;
             }
             return result;
+        }
+        public void MyLog(string text)
+        {
+            Console.ForegroundColor = this.Color;
+            Console.WriteLine(text);
+            Console.ForegroundColor = ConsoleColor.White;
+        }
+        public static void MyLog(string text, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            Console.WriteLine(text);
+            Console.ForegroundColor = ConsoleColor.White;
         }
     }
 }

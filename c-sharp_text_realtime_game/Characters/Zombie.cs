@@ -8,7 +8,7 @@ namespace c_sharp_text_realtime_game
     {
         private List<Character> ToEatDeadCharacters = new List<Character>();
 
-        public Zombie(string name) : base(name, 150, 0, 1, 20, 1500, 1500, 0.1)
+        public Zombie(string name) : base(name, 150, 0, 1, 20, 1500, 1500, 0.1, (ConsoleColor)8)
         {
         }
 
@@ -52,7 +52,7 @@ namespace c_sharp_text_realtime_game
 
         public void EatDeadCharacter(Character target)
         {
-            Console.WriteLine("{0} : mange le cadavre de {1}", this.Name, target.Name);
+            MyLog(this.Name + " mange le cadavre de " + target.Name);
             this.CurrentLife += target.MaximumLife;
             this.ToEatDeadCharacters.Remove(target);
         }

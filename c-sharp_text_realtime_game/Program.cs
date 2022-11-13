@@ -26,16 +26,16 @@ namespace c_sharp_text_realtime_game
             Character Character17 = new Necromancer("Granmerkal");
 
             //List<Character> Characters = new List<Character>() { Character2, Character12 };
-            /*List<Character> Characters = new List<Character>() {
+            List<Character> Characters = new List<Character>() {
                 Character1, Character2, Character3, Character4,
                 Character5, Character6, Character7, Character8
-            };*/
-            List<Character> Characters = new List<Character>() {
+            };
+            /*List<Character> Characters = new List<Character>() {
                 Character1, Character2, Character3, Character4,
                 Character5, Character6, Character7, Character8,
                 Character11, Character12, Character13, Character14,
                 Character15, Character16, Character17
-            };
+            };*/
 
             FightManager FightManager = new FightManager(Characters);
             await FightManager.StartBattleRoyal();

@@ -9,16 +9,18 @@ namespace c_sharp_text_realtime_game
     public class Necromancer : Undead, IPoisoning, ICamouflage
     {
         string IPoisoning.Name { get => Name; set => Name = value; }
+        ConsoleColor IPoisoning.Color { get => this.Color; set => this.Color = value; }
         string ICamouflage.Name { get => this.Name; set => this.Name = value; }
         bool ICamouflage.IsCamouflaged { get => IsCamouflaged; set => IsCamouflaged = value; }
         Timer ICamouflage.CamouflagedTimer { get => this.CamouflagedTimer; set => this.CamouflagedTimer = value; }
         List<Character> ICamouflage.Characters { get => this.FightManager.Characters; set => this.FightManager.Characters = value; }
+        ConsoleColor ICamouflage.Color { get => this.Color; set => this.Color = value; }
 
         bool IsCamouflaged = false;
         Timer CamouflagedTimer = new Timer();
         int CharactersNumber;
 
-        public Necromancer(string name) : base(name, 0, 10, 1, 0, 275, 275, 5)
+        public Necromancer(string name) : base(name, 0, 10, 1, 0, 275, 275, 5, (ConsoleColor)3)
         {
         }
 
@@ -47,7 +49,7 @@ namespace c_sharp_text_realtime_game
 
             if (target != null)
             {
-                Console.WriteLine("{0} Attaque", this.Name, target.Name);
+                MyLog(this.Name + " Attaque " + target.Name);
 
                 int attackMarge = AttackMarge(target);
 
@@ -59,18 +61,18 @@ namespace c_sharp_text_realtime_game
 
                     target.DelayAttacks.Add(damageDeal);
 
-                    Console.WriteLine("{0} PV restant : {1} PV", target.Name, target.CurrentLife);
+                    MyLog(target.Name + " PV restant : " + target.CurrentLife + " PV");
                 }
                 else
                 {
-                    Console.WriteLine("{0} : Echec de l'attaque !", this.Name);
+                    MyLog(this.Name + " : Echec de l'attaque !");
                 }
             }
         }
         public override void DeleteDeadCharacter(object sender, DeathEventArgs e)
         {
             base.DeleteDeadCharacter(sender, e);
-            Console.WriteLine("{0} : renforcement !", this.Name);
+            MyLog(this.Name + " : Renforcement ");
             this.AttackRate += 5;
             this.DefenseRate += 5;
             this.DamageRate += 5;
@@ -81,7 +83,7 @@ namespace c_sharp_text_realtime_game
             CamouflagedTimer.Elapsed -= (this as ICamouflage).CamouflagedEvent;
             if (IsCamouflaged)
             {
-                Console.WriteLine("{0} perd son camouflage", this.Name);
+                MyLog(this.Name + " perd son camouflage");
                 IsCamouflaged = false;
             }
         }

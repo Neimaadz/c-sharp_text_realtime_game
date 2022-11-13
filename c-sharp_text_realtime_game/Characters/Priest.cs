@@ -9,7 +9,8 @@ namespace c_sharp_text_realtime_game
     public class Priest : Character, IAlive, IHolyDamage
     {
         string IHolyDamage.Name { get => Name; set => Name = value; }
-        public Priest(string name) : base(name, 100, 125, 1.5, 90, 150, 150, 1)
+        ConsoleColor IHolyDamage.Color { get => this.Color; set => this.Color = value; }
+        public Priest(string name) : base(name, 100, 125, 1.5, 90, 150, 150, 1, (ConsoleColor)4)
         {
         }
 
@@ -29,7 +30,7 @@ namespace c_sharp_text_realtime_game
 
             if (target != null)
             {
-                Console.WriteLine("{0} Attaque", this.Name, target.Name);
+                MyLog(this.Name + " : Attaque " + target.Name);
 
                 int attackMarge = AttackMarge(target);
 
@@ -40,11 +41,11 @@ namespace c_sharp_text_realtime_game
 
                     target.DelayAttacks.Add(damageDeal);
 
-                    Console.WriteLine("{0} PV restant : {1} PV", target.Name, target.CurrentLife);
+                    MyLog(target.Name + " PV restant : " + target.CurrentLife + " PV");
                 }
                 else
                 {
-                    Console.WriteLine("{0} : Echec de l'attaque !", this.Name);
+                    MyLog(this.Name + " : Echec de l'attaque !");
                 }
             }
         }
@@ -53,8 +54,8 @@ namespace c_sharp_text_realtime_game
         {
             int heal = (int)(this.MaximumLife * 0.1);
             this.CurrentLife += heal;
-            Console.WriteLine("{0} se soigne", this.Name);
-            Console.WriteLine("{0} : +{1} PDV", this.Name, heal);
+            MyLog(this.Name + " se soigne");
+            MyLog(this.Name + " : +" + heal + " PDV");
 
             // Pour caper la vie
             if (this.CurrentLife >= this.MaximumLife)

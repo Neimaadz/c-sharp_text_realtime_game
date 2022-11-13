@@ -10,15 +10,17 @@ namespace c_sharp_text_realtime_game
     public class Assassin : Character, IPoisoning, ICamouflage
     {
         string IPoisoning.Name { get => this.Name; set => this.Name = value; }
+        ConsoleColor IPoisoning.Color { get => this.Color; set => this.Color = value; }
         string ICamouflage.Name { get => this.Name; set => this.Name = value; }
         bool ICamouflage.IsCamouflaged { get => IsCamouflaged; set => IsCamouflaged = value; }
         Timer ICamouflage.CamouflagedTimer { get => this.CamouflagedTimer; set => this.CamouflagedTimer = value; }
         List<Character> ICamouflage.Characters { get => this.FightManager.Characters; set => this.FightManager.Characters = value; }
+        ConsoleColor ICamouflage.Color { get => this.Color; set => this.Color = value; }
 
         bool IsCamouflaged = false;
         Timer CamouflagedTimer = new Timer();
 
-        public Assassin(string name) : base(name, 150, 100, 1, 100, 185, 185, 0.5)
+        public Assassin(string name) : base(name, 150, 100, 1, 100, 185, 185, 0.5, (ConsoleColor)2)
         {
         }
 
@@ -37,11 +39,11 @@ namespace c_sharp_text_realtime_game
             {
                 if (this.IsCamouflaged)
                 {
-                    Console.WriteLine("{0} perd son camouflage", this.Name);
+                    MyLog(this.Name + " perd son camouflage");
                     this.IsCamouflaged = false;
                 }
 
-                Console.WriteLine("{0} Attaque", this.Name, target.Name);
+                MyLog(this.Name + " : Attaque " + target.Name);
 
                 int attackMarge = AttackMarge(target);
 
@@ -52,7 +54,7 @@ namespace c_sharp_text_realtime_game
                     // Coup Critique
                     if (damageDeal > (target.CurrentLife / 2))
                     {
-                        Console.WriteLine("{0} Coup critique !", this.Name);
+                        MyLog(this.Name + " :" + " Coup critique !");
                         target.CurrentLife -= target.CurrentLife + damageDeal;
                     }
                     else
@@ -63,11 +65,11 @@ namespace c_sharp_text_realtime_game
                         target.DelayAttacks.Add(damageDeal);
                     }
 
-                    Console.WriteLine("{0} PV restant : {1} PV", target.Name, target.CurrentLife);
+                    MyLog(target.Name + " PV restant : " + target.CurrentLife + " PV");
                 }
                 else
                 {
-                    Console.WriteLine("{0} : Echec de l'attaque !", this.Name);
+                    MyLog(this.Name + " : Echec de l'attaque !");
                 }
             }
 
@@ -77,10 +79,10 @@ namespace c_sharp_text_realtime_game
 
         public override void RemainingCharacters(object sender, RemainingCharactersEventArgs e)
         {
-            Console.WriteLine("{0} : Il reste 5 combattans en vie", this.Name);
+            MyLog(this.Name + " :  Il reste 5 combattans en vie");
             if (this.IsCamouflaged)
             {
-                Console.WriteLine("{0} perd son camouflage", this.Name);
+                MyLog(this.Name + " perd son camouflage");
                 this.IsCamouflaged = false;
             }
         }
@@ -98,12 +100,12 @@ namespace c_sharp_text_realtime_game
             {
                 if (this.IsCamouflaged)
                 {
-                    Console.WriteLine("{0} perd son camouflage", this.Name);
+                    MyLog(this.Name + " perd son camouflage");
                     this.IsCamouflaged = false;
                 }
 
-                Console.WriteLine("{0} : empoisonnement", this.Name);
-                Console.WriteLine("{0} : -{1} PDV", this.Name, poisonDamage);
+                MyLog(this.Name + " : Empoisonement");
+                MyLog(this.Name + " : -" + poisonDamage + " PDV");
 
                 this.CurrentLife -= poisonDamage;
             }

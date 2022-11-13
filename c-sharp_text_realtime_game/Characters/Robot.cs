@@ -8,7 +8,7 @@ namespace c_sharp_text_realtime_game
 {
     public class Robot :Character
     {
-        public Robot(string name) : base(name, 25, 100, 1.2, 50, 275, 275, 0.5)
+        public Robot(string name) : base(name, 25, 100, 1.2, 50, 275, 275, 0.5, (ConsoleColor)5)
         {
         }
 
@@ -22,13 +22,12 @@ namespace c_sharp_text_realtime_game
         }
         public void IncreaseAttackRate()
         {
-            Console.WriteLine("{0} : augmente son attaque de 50%", this.Name);
+            MyLog(this.Name + " augmente son attaque de 50%");
             this.AttackRate += (int)(this.AttackRate * 0.5);
-            Console.WriteLine("{0} : taux d'attaque {1}", this.Name, this.AttackRate);
         }
         public override void PoisonEvent(object source, ElapsedEventArgs e)
         {
-            Console.WriteLine("{0} est immunisé contre le poison", this.Name);
+            MyLog(this.Name + " est immunisé contre le poison");
         }
 
         /*

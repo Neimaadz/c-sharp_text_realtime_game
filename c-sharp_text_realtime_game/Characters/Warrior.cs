@@ -8,7 +8,7 @@ namespace c_sharp_text_realtime_game
     {
         Timer IncreaseAttackSpeedTimer = new Timer();
 
-        public Warrior(string name) : base (name, 150, 105, 2.2, 150, 250, 250, 0.2)
+        public Warrior(string name) : base (name, 150, 105, 2.2, 150, 250, 250, 0.2, (ConsoleColor)7)
         {
         }
 
@@ -23,9 +23,8 @@ namespace c_sharp_text_realtime_game
 
         public void IncreaseAttackSpeed()
         {
-            Console.WriteLine("{0} : augmente sa vitesse d'attaque de 0,5", this.Name);
+            MyLog(this.Name + " augmente sa vitesse d'attaque de 0,5");
             this.AttackSpeed += 0.5;
-            Console.WriteLine("{0} : vitesse d'attaque {1}", this.Name, this.AttackSpeed);
             IncreaseAttackSpeedEventTimer();
         }
         public void IncreaseAttackSpeedEventTimer()

@@ -9,9 +9,11 @@ namespace c_sharp_text_realtime_game
     public class Alchimist : Character, IHolyDamage, IPoisoning
     {
         string IHolyDamage.Name { get => Name; set => Name = value; }
+        ConsoleColor IHolyDamage.Color { get => this.Color; set => this.Color = value; }
         string IPoisoning.Name { get => Name; set => Name = value; }
+        ConsoleColor IPoisoning.Color { get => this.Color; set => this.Color = value; }
 
-        public Alchimist(string name) : base(name, 50, 50, 1, 30, 150, 150, 0.1)
+        public Alchimist(string name) : base(name, 50, 50, 1, 30, 150, 150, 0.1, (ConsoleColor)1)
         {
         }
 
@@ -25,7 +27,7 @@ namespace c_sharp_text_realtime_game
             this.CurrentLife = characterHighestCurrentLife.CurrentLife;
             characterHighestCurrentLife.CurrentLife = currentLife;
 
-            Console.WriteLine("{0} Echange sa vie avec {1}", this.Name, characterHighestCurrentLife.Name);
+            MyLog(this.Name + " echange sa vie avec " + characterHighestCurrentLife.Name);
 
             // Pour caper la vie
             if (this.CurrentLife >= this.MaximumLife)
@@ -42,7 +44,7 @@ namespace c_sharp_text_realtime_game
             {
                 foreach (Character target in CharacterTargets)
                 {
-                    Console.WriteLine("{0} Attaque", this.Name, target.Name);
+                    MyLog(this.Name + " : Attaque " + target.Name);
 
                     int attackMarge = AttackMarge(target);
 
@@ -50,7 +52,7 @@ namespace c_sharp_text_realtime_game
                     {
                         if (target is ICamouflage && (target as ICamouflage).IsCamouflaged)
                         {
-                            Console.WriteLine("{0} perd son camouflage", target.Name);
+                            MyLog(target.Name + " perd son camouflage");
                             (target as ICamouflage).IsCamouflaged = false;
                         }
                         int damageDeal = attackMarge * DamageRate / 100;
@@ -59,11 +61,11 @@ namespace c_sharp_text_realtime_game
 
                         target.DelayAttacks.Add(damageDeal);
 
-                        Console.WriteLine("{0} PV restant : {1} PV", target.Name, target.CurrentLife);
+                        MyLog(target.Name + " PV restant : " + target.CurrentLife + " PV");
                     }
                     else
                     {
-                        Console.WriteLine("{0} : Echec de l'attaque !", this.Name);
+                        MyLog(this.Name + " : Echec de l'attaque !");
                     }
                 }
             }

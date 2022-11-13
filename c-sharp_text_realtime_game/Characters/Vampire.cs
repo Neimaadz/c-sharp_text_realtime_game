@@ -9,7 +9,7 @@ namespace c_sharp_text_realtime_game
     public class Vampire : Character
     {
         private int OldCurrentLife = 0;
-        public Vampire(string name) : base(name, 125, 125, 2, 50, 150, 150, 0.2)
+        public Vampire(string name) : base(name, 125, 125, 2, 50, 150, 150, 0.2, (ConsoleColor)6)
         {
             this.OldCurrentLife = this.CurrentLife;
         }
@@ -30,7 +30,7 @@ namespace c_sharp_text_realtime_game
 
             if (target != null)
             {
-                Console.WriteLine("{0} Attaque", this.Name, target.Name);
+                MyLog(this.Name + " : Attaque " + target.Name);
 
                 int attackMarge = AttackMarge(target);
 
@@ -43,11 +43,11 @@ namespace c_sharp_text_realtime_game
 
                     target.DelayAttacks.Add(damageDeal);
 
-                    Console.WriteLine("{0} PV restant : {1} PV", target.Name, target.CurrentLife);
+                    MyLog(target.Name + " PV restant : " + target.CurrentLife + " PV");
                 }
                 else
                 {
-                    Console.WriteLine("{0} : Echec de l'attaque !", this.Name);
+                    MyLog(this.Name + " : Echec de l'attaque !");
                 }
             }
         }
@@ -57,7 +57,7 @@ namespace c_sharp_text_realtime_game
             Character target = this.Target();
             int lifePointLost = this.OldCurrentLife - this.CurrentLife;
 
-            Console.WriteLine("{0} augmente de {1} le delai d'attaque de {2}", this.Name, lifePointLost, target.Name);
+            MyLog(this.Name + " augmente de " + lifePointLost + " le delai d'attaque de " + target.Name);
             target.DelayAttacks.Add(lifePointLost);
 
             this.OldCurrentLife = this.CurrentLife;
@@ -73,7 +73,7 @@ namespace c_sharp_text_realtime_game
             {
                 int damageSteal = (int)(damageDeal * 0.5);
                 this.CurrentLife += damageSteal;
-                Console.WriteLine("{0} vol de vie : +{1} PV", this.Name, damageSteal);
+                MyLog(this.Name + " vol de vie : +" + damageSteal + " PV");
 
                 // Pour caper la vie
                 if (this.CurrentLife >= this.MaximumLife)
