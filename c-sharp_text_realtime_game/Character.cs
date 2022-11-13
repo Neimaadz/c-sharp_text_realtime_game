@@ -6,6 +6,7 @@ using System.Timers;
 namespace c_sharp_text_realtime_game
 {
     public delegate void DeathEventHandlerDelegate(Object sender, DeathEventArgs e);
+    public delegate void ReamainingCharactersEventHandlerDelegate(Object sender, RemainingCharactersEventArgs e);
 
     public class Character
     {
@@ -21,12 +22,13 @@ namespace c_sharp_text_realtime_game
         public Random Random;
         public int RandomSeed;
         public FightManager FightManager;
-        List<Character> TempCharacters = new List<Character>();
+        protected List<Character> TempCharacters = new List<Character>();
         public event DeathEventHandlerDelegate DeadCharacterEvent;
         public List<int> DelayAttacks = new List<int>();
         public List<int> PoisonDamages = new List<int>();
         public bool IsSpecialSpellAvailable = true;
         Timer SpecialSpellTimer = new Timer();
+        public event ReamainingCharactersEventHandlerDelegate ReamainingCharactersEvent;
 
         public Character(string name, int attackRate, int defenseRate, double attackSpeed, int damageRate, int maximumLife, int currentLife, double powerSpeed)
         {
@@ -56,6 +58,7 @@ namespace c_sharp_text_realtime_game
             foreach (Character character in TempCharacters)
             {
                 character.DeadCharacterEvent += DeleteDeadCharacter;
+                character.ReamainingCharactersEvent += RemainingCharacters;
             }
 
             PoisonEventTimer(5000);
@@ -66,9 +69,29 @@ namespace c_sharp_text_realtime_game
                 await DefaultAttackTask();
             }
 
+            Dead();
+
+            List<Character> remainingCharacters = this.FightManager.Characters;
+
+            // Il reste moins de 5 combattants en vie
+            if (remainingCharacters.Count == 5)
+            {
+                RemainingCharactersEventArgs args = new RemainingCharactersEventArgs();
+                args.RemainingCharacters = remainingCharacters;
+
+                // Send remaining characters event to all listeners
+                this.ReamainingCharactersEvent?.Invoke(this, args);
+            }
+
+            return this;
+        }
+
+        protected void Dead()
+        {
             foreach (Character character in TempCharacters)
             {
                 character.DeadCharacterEvent -= DeleteDeadCharacter;
+                character.ReamainingCharactersEvent -= RemainingCharacters;
             }
 
             DeathEventArgs args = new DeathEventArgs();
@@ -76,8 +99,6 @@ namespace c_sharp_text_realtime_game
 
             // Send my death event to all other characters (all listeners)
             this.DeadCharacterEvent?.Invoke(this, args);   // Invoke the delegate
-
-            return this;
         }
 
         virtual public void SpecialSpell()
@@ -186,7 +207,6 @@ namespace c_sharp_text_realtime_game
 
             if (poisonDamage > 0)
             {
-                Console.WriteLine("{0} : {1} PDV", this.Name, this.CurrentLife);
                 Console.WriteLine("{0} : empoisonnement", this.Name);
                 Console.WriteLine("{0} : -{1} PDV", this.Name, poisonDamage);
 
@@ -200,8 +220,18 @@ namespace c_sharp_text_realtime_game
             Console.WriteLine("{0} : {1} est mort", this.Name, e.DeadCharacter.Name);
 
             // Delete the dead target
-            FightManager.Characters.Remove(e.DeadCharacter);
+            this.FightManager.Characters.Remove(e.DeadCharacter);
         }
+
+        public virtual void RemainingCharacters(object sender, RemainingCharactersEventArgs e)
+        {
+            Console.WriteLine("{0} : Il reste 5 combattans en vie", this.Name);
+        }
+
+
+
+
+
 
 
 
@@ -224,11 +254,25 @@ namespace c_sharp_text_realtime_game
             for (int i = 0; i < this.TempCharacters.Count; i++)
             {
                 Character currentCharacter = this.TempCharacters[i];
+
                 // Si le personnage testé n'est pas celui qui attaque et qu'il est vivant
                 if (currentCharacter != this && currentCharacter.CurrentLife > 0)
                 {
-                    // On l'ajoute à la liste des cible valide
-                    validTarget.Add(currentCharacter);
+                    // Si le personnage NE POSSEDE PAS la capacité de se camoufler
+                    if (!(currentCharacter is ICamouflage))
+                    {
+                        // On l'ajoute à la liste des cible valide
+                        validTarget.Add(currentCharacter);
+                    }
+                    // le personnage POSSEDE la capacité de se camoufler
+                    else
+                    {
+                        // Si le personnage n'est pas camouflé, il est donc une cible
+                        if (!(currentCharacter as ICamouflage).IsCamouflaged)
+                        {
+                            validTarget.Add(currentCharacter);
+                        }
+                    }
                 }
             }
 

@@ -15,6 +15,9 @@ namespace c_sharp_text_realtime_game
         {
         }
 
+
+
+
         public override void SpecialSpell()
         {
             Character characterHighestCurrentLife = FightManager.Characters.OrderByDescending(x => x.CurrentLife).First();
@@ -33,29 +36,69 @@ namespace c_sharp_text_realtime_game
 
         public override void Attack()
         {
-            Character target = Target();
+            List<Character> CharacterTargets = Targets();
 
-            if (target != null)
+            if (CharacterTargets.Count > 0)
             {
-                Console.WriteLine("{0} Attaque", this.Name, target.Name);
-
-                int attackMarge = AttackMarge(target);
-
-                if (attackMarge > 0)
+                foreach (Character target in CharacterTargets)
                 {
-                    int damageDeal = attackMarge * DamageRate / 100;
-                    (this as IHolyDamage).DealHolyDamage(target, damageDeal, 0.5);
-                    (this as IPoisoning).DealPoisonDamage(target, damageDeal, 1);
+                    Console.WriteLine("{0} Attaque", this.Name, target.Name);
 
-                    target.DelayAttacks.Add(damageDeal);
+                    int attackMarge = AttackMarge(target);
 
-                    Console.WriteLine("{0} PV restant : {1} PV", target.Name, target.CurrentLife);
-                }
-                else
-                {
-                    Console.WriteLine("{0} : Echec de l'attaque !", this.Name);
+                    if (attackMarge > 0)
+                    {
+                        if (target is ICamouflage && (target as ICamouflage).IsCamouflaged)
+                        {
+                            Console.WriteLine("{0} IsCamouflaged {1}", target.Name, (target as ICamouflage).IsCamouflaged);
+                            Console.WriteLine("{0} perd son camouflage", target.Name);
+                            (target as ICamouflage).IsCamouflaged = false;
+                        }
+                        int damageDeal = attackMarge * DamageRate / 100;
+                        (this as IHolyDamage).DealHolyDamage(target, damageDeal, 0.5);
+                        (this as IPoisoning).DealPoisonDamage(target, damageDeal, 1);
+
+                        target.DelayAttacks.Add(damageDeal);
+
+                        Console.WriteLine("{0} PV restant : {1} PV", target.Name, target.CurrentLife);
+                    }
+                    else
+                    {
+                        Console.WriteLine("{0} : Echec de l'attaque !", this.Name);
+                    }
                 }
             }
+        }
+
+        private List<Character> Targets()
+        {
+            List<Character> targets = new List<Character>();   // Rénitialiser la liste des targets
+            List<Character> validTarget = new List<Character>();
+
+            for (int i = 0; i < this.TempCharacters.Count; i++)
+            {
+                Character currentCharacter = this.TempCharacters[i];
+                if (currentCharacter != this && currentCharacter.CurrentLife > 0)
+                {
+                    validTarget.Add(currentCharacter);
+                }
+            }
+            
+
+            if (validTarget.Count > 0)
+            {
+                for (int i = 0; i < validTarget.Count; i++)
+                {
+                    // 50% de chances
+                    if (Random.Next(2) == 1)
+                    {
+                        Character target = validTarget[i];
+                        targets.Add(target);
+                    }
+                }
+                return targets;
+            }
+            return targets;
         }
 
         protected override int RollDice()

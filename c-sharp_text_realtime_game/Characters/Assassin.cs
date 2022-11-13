@@ -3,21 +3,30 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace c_sharp_text_realtime_game
 {
-    public class Assassin : Character, IPoisoning
+    public class Assassin : Character, IPoisoning, ICamouflage
     {
-        string IPoisoning.Name { get => Name; set => Name = value; }
+        string IPoisoning.Name { get => this.Name; set => this.Name = value; }
+        string ICamouflage.Name { get => this.Name; set => this.Name = value; }
+        bool ICamouflage.IsCamouflaged { get => IsCamouflaged; set => IsCamouflaged = value; }
+        Timer ICamouflage.CamouflagedTimer { get => this.CamouflagedTimer; set => this.CamouflagedTimer = value; }
+        List<Character> ICamouflage.Characters { get => this.FightManager.Characters; set => this.FightManager.Characters = value; }
+
+        bool IsCamouflaged = false;
+        Timer CamouflagedTimer = new Timer();
 
         public Assassin(string name) : base(name, 150, 100, 1, 100, 185, 185, 0.5)
         {
         }
 
 
+
         public override void SpecialSpell()
         {
-            // TODO
+            (this as ICamouflage).Camouflage();
         }
 
         public override void Attack()
@@ -26,6 +35,12 @@ namespace c_sharp_text_realtime_game
 
             if (target != null)
             {
+                if (this.IsCamouflaged)
+                {
+                    Console.WriteLine("{0} perd son camouflage", this.Name);
+                    this.IsCamouflaged = false;
+                }
+
                 Console.WriteLine("{0} Attaque", this.Name, target.Name);
 
                 int attackMarge = AttackMarge(target);
@@ -47,6 +62,7 @@ namespace c_sharp_text_realtime_game
 
                         target.DelayAttacks.Add(damageDeal);
                     }
+
                     Console.WriteLine("{0} PV restant : {1} PV", target.Name, target.CurrentLife);
                 }
                 else
@@ -55,6 +71,42 @@ namespace c_sharp_text_realtime_game
                 }
             }
 
+        }
+
+
+
+        public override void RemainingCharacters(object sender, RemainingCharactersEventArgs e)
+        {
+            Console.WriteLine("{0} : Il reste 5 combattans en vie", this.Name);
+            if (this.IsCamouflaged)
+            {
+                Console.WriteLine("{0} perd son camouflage", this.Name);
+                this.IsCamouflaged = false;
+            }
+        }
+
+        public override void PoisonEvent(object source, ElapsedEventArgs e)
+        {
+            int poisonDamage = 0;
+
+            this.PoisonDamages.ForEach(poison =>
+            {
+                poisonDamage += poison;
+            });
+
+            if (poisonDamage > 0)
+            {
+                if (this.IsCamouflaged)
+                {
+                    Console.WriteLine("{0} perd son camouflage", this.Name);
+                    this.IsCamouflaged = false;
+                }
+
+                Console.WriteLine("{0} : empoisonnement", this.Name);
+                Console.WriteLine("{0} : -{1} PDV", this.Name, poisonDamage);
+
+                this.CurrentLife -= poisonDamage;
+            }
         }
 
 

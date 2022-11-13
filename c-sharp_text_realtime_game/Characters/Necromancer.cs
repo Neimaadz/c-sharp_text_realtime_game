@@ -13,6 +13,8 @@ namespace c_sharp_text_realtime_game
         {
         }
 
+
+
         public override void Attack()
         {
             Character target = Target();

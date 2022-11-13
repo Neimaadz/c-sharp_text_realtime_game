@@ -13,6 +13,8 @@ namespace c_sharp_text_realtime_game
         {
         }
 
+
+
         /*
          * POUVOIR :se soigne de 10% de sa vie maximum
          */
@@ -74,9 +76,24 @@ namespace c_sharp_text_realtime_game
             {
                 Character currentCharacter = this.FightManager.Characters[i];
 
+                // Si le personnage testé n'est pas celui qui attaque et qu'il est vivant
                 if (currentCharacter != this && currentCharacter.CurrentLife > 0)
                 {
-                    validTarget.Add(currentCharacter);
+                    // Si le personnage NE POSSEDE PAS la capacité de se camoufler
+                    if (!(currentCharacter is ICamouflage))
+                    {
+                        // On l'ajoute à la liste des cible valide
+                        validTarget.Add(currentCharacter);
+                    }
+                    // le personnage POSSEDE la capacité de se camoufler
+                    else
+                    {
+                        // Si le personnage n'est pas camouflé, il est donc une cible
+                        if (!(currentCharacter as ICamouflage).IsCamouflaged)
+                        {
+                            validTarget.Add(currentCharacter);
+                        }
+                    }
                 }
             }
 
