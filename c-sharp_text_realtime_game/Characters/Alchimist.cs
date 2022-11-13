@@ -50,7 +50,6 @@ namespace c_sharp_text_realtime_game
                     {
                         if (target is ICamouflage && (target as ICamouflage).IsCamouflaged)
                         {
-                            Console.WriteLine("{0} IsCamouflaged {1}", target.Name, (target as ICamouflage).IsCamouflaged);
                             Console.WriteLine("{0} perd son camouflage", target.Name);
                             (target as ICamouflage).IsCamouflaged = false;
                         }
