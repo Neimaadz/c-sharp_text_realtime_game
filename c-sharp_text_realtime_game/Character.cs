@@ -46,7 +46,7 @@ namespace c_sharp_text_realtime_game
             SpecialSpellTimer.Elapsed += SpecialSpellEvent;
         }
 
-        public void SetFightManager(FightManager fightManager)
+        public virtual void SetFightManager(FightManager fightManager)
         {
             this.FightManager = fightManager;
             TempCharacters.AddRange(fightManager.Characters);

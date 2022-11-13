@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Timers;
+
 namespace c_sharp_text_realtime_game
 {
     public class Undead : Character
@@ -14,6 +16,11 @@ namespace c_sharp_text_realtime_game
             this.MaximumLife = maximumLife;
             this.CurrentLife = currentLife;
             this.PowerSpeed = powerSpeed;
+        }
+
+        public override void PoisonEvent(object source, ElapsedEventArgs e)
+        {
+            Console.WriteLine("{0} est immunisé contre le poison", this.Name);
         }
     }
 }

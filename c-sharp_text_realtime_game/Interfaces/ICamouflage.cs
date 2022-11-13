@@ -26,7 +26,7 @@ namespace c_sharp_text_realtime_game
         public void CamouflagedEventTimer()
         {
             CamouflagedTimer.Elapsed += CamouflagedEvent;
-            CamouflagedTimer.Interval = 1000;
+            CamouflagedTimer.Interval = 5000;
             CamouflagedTimer.Enabled = true;
         }
         public void CamouflagedEvent(object source, ElapsedEventArgs e)
