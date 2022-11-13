@@ -17,7 +17,6 @@ namespace c_sharp_text_realtime_game
             Character Character7 = new Alchimist("Singed");
             Character Character8 = new Necromancer("Gromoun");
 
-
             Character Character11 = new Zombie("Mazimo");
             Character Character12 = new Warrior("François");
             Character Character13 = new Robot("Cyborki");
@@ -37,9 +36,9 @@ namespace c_sharp_text_realtime_game
                 Character11, Character12, Character13, Character14,
                 Character15, Character16, Character17
             };
-            FightManager FightManager = new FightManager(Characters);
 
-            await FightManager.Start();
+            FightManager FightManager = new FightManager(Characters);
+            await FightManager.StartBattleRoyal();
         }
     }
 }

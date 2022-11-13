@@ -203,6 +203,10 @@ namespace c_sharp_text_realtime_game
             FightManager.Characters.Remove(e.DeadCharacter);
         }
 
+
+
+
+
         public static void DealCommonDamage(Character target, int damageDeal, double rate)
         {
             int damage = (int)(damageDeal * rate);
@@ -210,11 +214,6 @@ namespace c_sharp_text_realtime_game
 
             target.CurrentLife -= damage;
         }
-
-
-
-
-
 
         // Selectionner une cible valide
         public virtual Character Target()
@@ -241,10 +240,12 @@ namespace c_sharp_text_realtime_game
             }
             return null;
         }
+
         public int DelayAttack(double speed)
         {
             return (int)((1000 / speed) - RollDice());
         }
+
         protected int AttackMarge(Character target)
         {
             return AttackRoll() - target.DefenseRoll();

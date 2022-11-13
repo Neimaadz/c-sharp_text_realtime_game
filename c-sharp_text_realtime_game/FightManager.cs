@@ -18,9 +18,9 @@ namespace c_sharp_text_realtime_game
         }
 
 
-        public async Task Start()
+        public async Task StartBattleRoyal()
         {
-            Console.WriteLine("Start");
+            Console.WriteLine("Starting Battle Royal");
 
             List<Task<Character>> attackTasks = new List<Task<Character>>();
             foreach (Character character in Characters)
@@ -39,6 +39,13 @@ namespace c_sharp_text_realtime_game
                 Console.WriteLine("Winner is : {0}", character.Name);
                 Console.WriteLine("{0} PV restant : {1} PV", character.Name, character.CurrentLife);
             }
+
+            Console.WriteLine("Finish");
+
+        }
+        public async Task StartMultipleFight()
+        {
+            Console.WriteLine("Starting Multiple Fight");
 
             Console.WriteLine("Finish");
 
