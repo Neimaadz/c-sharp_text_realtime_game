@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace c_sharp_text_realtime_game
 {
@@ -24,6 +25,10 @@ namespace c_sharp_text_realtime_game
             Console.WriteLine("{0} : augmente son attaque de 50%", this.Name);
             this.AttackRate += (int)(this.AttackRate * 0.5);
             Console.WriteLine("{0} : taux d'attaque {1}", this.Name, this.AttackRate);
+        }
+        public override void PoisonEvent(object source, ElapsedEventArgs e)
+        {
+            Console.WriteLine("{0} est immunisé contre le poison", this.Name);
         }
 
         /*

@@ -175,7 +175,7 @@ namespace c_sharp_text_realtime_game
             poisonEventTimer.Enabled = true;
         }
 
-        private void PoisonEvent(object source, ElapsedEventArgs e)
+        public virtual void PoisonEvent(object source, ElapsedEventArgs e)
         {
             int poisonDamage = 0;
 
