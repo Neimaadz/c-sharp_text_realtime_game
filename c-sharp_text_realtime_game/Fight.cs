@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Newtonsoft.Json;
 
 namespace c_sharp_text_realtime_game
 {
@@ -25,7 +27,7 @@ namespace c_sharp_text_realtime_game
 
     public class Fight
     {
-        public List<Character> Characters;
+        public List<Character> Characters = new List<Character>();
         public Character Winner;
         public List<CharacterType> RankCharacterTypes = new List<CharacterType>();
         private ConsoleKey ConsoleKey;
@@ -63,6 +65,9 @@ namespace c_sharp_text_realtime_game
             if (finished == cancel)
             {
                 Console.WriteLine("Fight Cancelled.");
+
+                WriteJsonFile(Characters);
+
                 return this;
             }
             else
@@ -138,7 +143,7 @@ namespace c_sharp_text_realtime_game
 
         private async Task RaceCancellation()
         {
-            Console.WriteLine("Press the " + ConsoleKey + " key to cancel the course...");
+            Console.WriteLine("Press the " + ConsoleKey + " key to cancel the fight");
             while (Console.ReadKey(true).Key != ConsoleKey)
             {
                 //Console.WriteLine("Press the any key to cancel...");
@@ -147,7 +152,15 @@ namespace c_sharp_text_realtime_game
             CancellationTokenSource.Cancel();
         }
 
-
+        static void WriteJsonFile(List<Character> characters)
+        {
+            string data = JsonConvert.SerializeObject(characters, Formatting.Indented, new JsonSerializerSettings()
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
+            string path = Path.Combine(Environment.CurrentDirectory, "save.json");
+            File.WriteAllText(path, data);
+        }
 
     }
 }

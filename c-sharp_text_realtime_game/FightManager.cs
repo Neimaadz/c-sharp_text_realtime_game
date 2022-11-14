@@ -8,7 +8,7 @@ namespace c_sharp_text_realtime_game
 {
     public class FightManager
     {
-        public List<Fight> Fights;
+        public List<Fight> Fights = new List<Fight>();
         public List<Fight> FightResults = new List<Fight>();
 
         public FightManager(List<Fight> fights)
@@ -34,6 +34,11 @@ namespace c_sharp_text_realtime_game
                 FightResults.Add(fightFinished.Result);
             }
 
+            Console.WriteLine("All Fight Are Finished !");
+            Console.WriteLine();
+
+
+            // Calcul du score global parmi tous les combats
             List<CharacterType> rankResults = new List<CharacterType>();
 
             foreach (Fight fightResult in FightResults)
@@ -50,9 +55,6 @@ namespace c_sharp_text_realtime_game
                     }
                 }
             }
-
-            Console.WriteLine("All Fight Are Finished !");
-            Console.WriteLine();
 
             Console.WriteLine("Les meilleurs type de personnage sont :");
 

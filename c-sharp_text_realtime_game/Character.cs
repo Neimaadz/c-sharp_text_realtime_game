@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using Newtonsoft.Json;
 using Timer = System.Timers.Timer;
 
 namespace c_sharp_text_realtime_game
@@ -22,9 +23,9 @@ namespace c_sharp_text_realtime_game
         public double PowerSpeed;
         public ConsoleColor Color { get; set; }
 
-        public Random Random;
-        public int RandomSeed;
-        public Fight Fight;
+        [JsonIgnore] public Random Random;
+        [JsonIgnore] public int RandomSeed;
+        [JsonIgnore] public Fight Fight;
         protected List<Character> TempCharacters = new List<Character>();
         public event DeathEventHandlerDelegate DeadCharacterEvent;
         public List<int> DelayAttacks = new List<int>();

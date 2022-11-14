@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
+using Newtonsoft.Json;
+using Formatting = Newtonsoft.Json.Formatting;
 
 namespace c_sharp_text_realtime_game
 {
@@ -61,19 +66,18 @@ namespace c_sharp_text_realtime_game
             CancellationTokenSource Cancel2 = new CancellationTokenSource();
             CancellationTokenSource Cancel3 = new CancellationTokenSource();
 
-            Fight fight1 = new Fight(characters1, ConsoleKey.C, Cancel1);
+            Fight fight1 = new Fight(characters1, ConsoleKey.Escape, Cancel1);
             Fight fight2 = new Fight(characters2, ConsoleKey.V, Cancel2);
-            Fight fight3 = new Fight(characters1, ConsoleKey.Escape, Cancel2);
 
             List<Fight> fights = new List<Fight>()
             {
-                fight3
+                fight1
             };
 
             FightManager fightManager = new FightManager(fights);
             await fightManager.StartMultipleFight();
-
         }
+
     }
 }
 
