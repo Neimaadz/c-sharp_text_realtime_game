@@ -22,10 +22,11 @@ namespace c_sharp_text_realtime_game
 
         public Random Random;
         public int RandomSeed;
-        public FightManager FightManager;
+        public Fight Fight;
         protected List<Character> TempCharacters = new List<Character>();
         public event DeathEventHandlerDelegate DeadCharacterEvent;
         public List<int> DelayAttacks = new List<int>();
+        Timer PoisonTimer = new Timer();
         public List<int> PoisonDamages = new List<int>();
         public bool IsSpecialSpellAvailable = true;
         Timer SpecialSpellTimer = new Timer();
@@ -48,10 +49,10 @@ namespace c_sharp_text_realtime_game
             SpecialSpellTimer.Elapsed += SpecialSpellEvent;
         }
 
-        public virtual void SetFightManager(FightManager fightManager)
+        public virtual void SetFight(Fight fight)
         {
-            this.FightManager = fightManager;
-            TempCharacters.AddRange(fightManager.Characters);
+            this.Fight = fight;
+            TempCharacters.AddRange(fight.Characters);
             TempCharacters.Remove(this);
         }
 
@@ -65,7 +66,7 @@ namespace c_sharp_text_realtime_game
 
             PoisonEventTimer(5000);
 
-            while (this.CurrentLife > 0 && FightManager.Characters.Count > 1)
+            while (this.CurrentLife > 0 && this.Fight.Characters.Count > 1)
             {
                 await DamageTakenDelayTask();
                 await DefaultAttackTask();
@@ -73,7 +74,7 @@ namespace c_sharp_text_realtime_game
 
             Dead();
 
-            List<Character> remainingCharacters = this.FightManager.Characters;
+            List<Character> remainingCharacters = this.Fight.Characters;
 
             // Il reste moins de 5 combattants en vie
             if (remainingCharacters.Count == 5)
@@ -90,10 +91,12 @@ namespace c_sharp_text_realtime_game
 
         protected void Dead()
         {
+            this.PoisonTimer.Enabled = false;
             foreach (Character character in TempCharacters)
             {
                 character.DeadCharacterEvent -= DeleteDeadCharacter;
                 character.ReamainingCharactersEvent -= RemainingCharacters;
+                character.PoisonTimer.Elapsed -= PoisonEvent;
             }
 
             DeathEventArgs args = new DeathEventArgs();
@@ -192,10 +195,9 @@ namespace c_sharp_text_realtime_game
 
         public void PoisonEventTimer (int interval)
         {
-            Timer poisonEventTimer = new Timer();
-            poisonEventTimer.Elapsed += PoisonEvent;
-            poisonEventTimer.Interval = interval;
-            poisonEventTimer.Enabled = true;
+            this.PoisonTimer.Elapsed += PoisonEvent;
+            this.PoisonTimer.Interval = interval;
+            this.PoisonTimer.Enabled = true;
         }
 
         public virtual void PoisonEvent(object source, ElapsedEventArgs e)
@@ -222,7 +224,7 @@ namespace c_sharp_text_realtime_game
             MyLog(this.Name + " : " + e.DeadCharacter.Name + " est mort");
 
             // Delete the dead target
-            this.FightManager.Characters.Remove(e.DeadCharacter);
+            this.Fight.Characters.Remove(e.DeadCharacter);
         }
 
         public virtual void RemainingCharacters(object sender, RemainingCharactersEventArgs e)

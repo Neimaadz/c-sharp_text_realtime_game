@@ -1,54 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace c_sharp_text_realtime_game
 {
     public class FightManager
     {
-        public List<Character> Characters;
+        public List<Fight> Fights;
 
-        public FightManager(List<Character> characters)
+        public FightManager(List<Fight> fights)
         {
-            this.Characters = characters;
-            foreach (Character character in Characters)
-            {
-                character.SetFightManager(this);
-            }
+            this.Fights = fights;
         }
 
-
-        public async Task StartBattleRoyal()
-        {
-            Console.WriteLine("Starting Battle Royal");
-
-            List<Task<Character>> attackTasks = new List<Task<Character>>();
-            foreach (Character character in Characters)
-            {
-                attackTasks.Add(character.Start());
-            }
-
-            while (attackTasks.Count > 1)
-            {
-                Task<Character> CharaterDead =  await Task.WhenAny(attackTasks);
-                attackTasks.Remove(CharaterDead);
-            }
-
-            foreach (Character character in Characters)
-            {
-                Console.WriteLine("Winner is : {0}", character.Name);
-                Console.WriteLine("{0} PV restant : {1} PV", character.Name, character.CurrentLife);
-            }
-
-            Console.WriteLine("Finish");
-
-        }
         public async Task StartMultipleFight()
         {
             Console.WriteLine("Starting Multiple Fight");
 
-            Console.WriteLine("Finish");
+            List<Task<Fight>> fightTasks = new List<Task<Fight>>();
+            foreach (Fight fight in Fights)
+            {
+                fightTasks.Add(fight.StartBattleRoyal());
+            }
 
+            while (fightTasks.Count > 0)
+            {
+                Task<Fight> fightFinished = await Task.WhenAny(fightTasks);
+                fightTasks.Remove(fightFinished);
+            }
+
+            //await Task.WhenAll(fightTasks);
+
+            Console.WriteLine("All Fight Are Finished !");
         }
 
 

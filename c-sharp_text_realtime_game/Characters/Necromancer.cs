@@ -13,7 +13,7 @@ namespace c_sharp_text_realtime_game
         string ICamouflage.Name { get => this.Name; set => this.Name = value; }
         bool ICamouflage.IsCamouflaged { get => IsCamouflaged; set => IsCamouflaged = value; }
         Timer ICamouflage.CamouflagedTimer { get => this.CamouflagedTimer; set => this.CamouflagedTimer = value; }
-        List<Character> ICamouflage.Characters { get => this.FightManager.Characters; set => this.FightManager.Characters = value; }
+        List<Character> ICamouflage.Characters { get => this.Fight.Characters; set => this.Fight.Characters = value; }
         ConsoleColor ICamouflage.Color { get => this.Color; set => this.Color = value; }
 
         bool IsCamouflaged = false;
@@ -24,10 +24,11 @@ namespace c_sharp_text_realtime_game
         {
         }
 
-        public override void SetFightManager(FightManager fightManager)
+
+        public override void SetFight(Fight fight)
         {
-            base.SetFightManager(fightManager);
-            this.CharactersNumber = this.FightManager.Characters.Count;
+            base.SetFight(fight);
+            this.CharactersNumber = this.Fight.Characters.Count;
         }
 
 
@@ -37,7 +38,7 @@ namespace c_sharp_text_realtime_game
          */
         public override void SpecialSpell()
         {
-            if (this.FightManager.Characters.Count == CharactersNumber)
+            if (this.Fight.Characters.Count == CharactersNumber)
             {
                 (this as ICamouflage).Camouflage();
             }

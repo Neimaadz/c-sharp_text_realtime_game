@@ -14,7 +14,7 @@ namespace c_sharp_text_realtime_game
         string ICamouflage.Name { get => this.Name; set => this.Name = value; }
         bool ICamouflage.IsCamouflaged { get => IsCamouflaged; set => IsCamouflaged = value; }
         Timer ICamouflage.CamouflagedTimer { get => this.CamouflagedTimer; set => this.CamouflagedTimer = value; }
-        List<Character> ICamouflage.Characters { get => this.FightManager.Characters; set => this.FightManager.Characters = value; }
+        List<Character> ICamouflage.Characters { get => this.Fight.Characters; set => this.Fight.Characters = value; }
         ConsoleColor ICamouflage.Color { get => this.Color; set => this.Color = value; }
 
         bool IsCamouflaged = false;

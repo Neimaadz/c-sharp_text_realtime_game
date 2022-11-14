@@ -73,9 +73,9 @@ namespace c_sharp_text_realtime_game
             List<Character> validTarget = new List<Character>();
             List<Character> undeadCharacters = new List<Character>();
 
-            for (int i = 0; i < this.FightManager.Characters.Count; i++)
+            for (int i = 0; i < this.Fight.Characters.Count; i++)
             {
-                Character currentCharacter = this.FightManager.Characters[i];
+                Character currentCharacter = this.Fight.Characters[i];
 
                 // Si le personnage testé n'est pas celui qui attaque et qu'il est vivant
                 if (currentCharacter != this && currentCharacter.CurrentLife > 0)

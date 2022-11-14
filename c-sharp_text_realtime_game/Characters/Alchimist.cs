@@ -22,7 +22,7 @@ namespace c_sharp_text_realtime_game
 
         public override void SpecialSpell()
         {
-            Character characterHighestCurrentLife = FightManager.Characters.OrderByDescending(x => x.CurrentLife).First();
+            Character characterHighestCurrentLife = this.Fight.Characters.OrderByDescending(x => x.CurrentLife).First();
             int currentLife = this.CurrentLife;
             this.CurrentLife = characterHighestCurrentLife.CurrentLife;
             characterHighestCurrentLife.CurrentLife = currentLife;
