@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace c_sharp_text_realtime_game
@@ -55,12 +56,18 @@ namespace c_sharp_text_realtime_game
                 Character15, Character16, Character17, Character18
             };
 
-            Fight fight1 = new Fight(characters1);
-            Fight fight2 = new Fight(characters2);
+
+            CancellationTokenSource Cancel1 = new CancellationTokenSource();
+            CancellationTokenSource Cancel2 = new CancellationTokenSource();
+            CancellationTokenSource Cancel3 = new CancellationTokenSource();
+
+            Fight fight1 = new Fight(characters1, ConsoleKey.C, Cancel1);
+            Fight fight2 = new Fight(characters2, ConsoleKey.V, Cancel2);
+            Fight fight3 = new Fight(characters1, ConsoleKey.Escape, Cancel2);
 
             List<Fight> fights = new List<Fight>()
             {
-                fight1, fight2
+                fight3
             };
 
             FightManager fightManager = new FightManager(fights);

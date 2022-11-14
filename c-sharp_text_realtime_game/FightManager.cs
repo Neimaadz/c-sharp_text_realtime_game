@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,6 +9,7 @@ namespace c_sharp_text_realtime_game
     public class FightManager
     {
         public List<Fight> Fights;
+        public List<Fight> FightResults = new List<Fight>();
 
         public FightManager(List<Fight> fights)
         {
@@ -21,21 +23,48 @@ namespace c_sharp_text_realtime_game
             List<Task<Fight>> fightTasks = new List<Task<Fight>>();
             foreach (Fight fight in Fights)
             {
-                fightTasks.Add(fight.StartBattleRoyal());
+                fightTasks.Add(fight.Start());
             }
 
             while (fightTasks.Count > 0)
             {
                 Task<Fight> fightFinished = await Task.WhenAny(fightTasks);
                 fightTasks.Remove(fightFinished);
+
+                FightResults.Add(fightFinished.Result);
             }
 
-            //await Task.WhenAll(fightTasks);
+            List<CharacterType> rankResults = new List<CharacterType>();
+
+            foreach (Fight fightResult in FightResults)
+            {
+                foreach (CharacterType characterType in fightResult.RankCharacterTypes)
+                {
+                    if (!rankResults.Any(m => m.Type == characterType.Type))
+                    {
+                        rankResults.Add(new CharacterType(characterType.Type, characterType.NumberWin));
+                    }
+                    else
+                    {
+                        rankResults.Find(m => m.Type == characterType.Type).NumberWin += characterType.NumberWin;
+                    }
+                }
+            }
 
             Console.WriteLine("All Fight Are Finished !");
+            Console.WriteLine();
+
+            Console.WriteLine("Les meilleurs type de personnage sont :");
+
+            foreach (CharacterType characterType in rankResults.OrderByDescending(x => x.NumberWin))
+            {
+                Console.WriteLine("{0} avec un score de victoire de : {1}", characterType.Type.Name, characterType.NumberWin);
+            }
         }
 
-
     }
+
+
+
 }
 
