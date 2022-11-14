@@ -45,43 +45,37 @@ namespace c_sharp_text_realtime_game
 
 
 
+            CancellationTokenSource Cancel1 = new CancellationTokenSource();
+            CancellationTokenSource Cancel2 = new CancellationTokenSource();
+
             List<Character> characters1 = new List<Character>() {
-                Character1, Character2, Character3, Character4,
-                Character5, Character6, Character7, Character8
-            };
-            List<Character> characters2 = new List<Character>() {
                 Character11, Character12, Character13, Character14,
                 Character15, Character16, Character17, Character18
             };
 
-
-            CancellationTokenSource Cancel1 = new CancellationTokenSource();
-            CancellationTokenSource Cancel2 = new CancellationTokenSource();
-
             Fight fight1 = new Fight(characters1, ConsoleKey.Escape, Cancel1);
-            Fight fight2 = new Fight(characters2, ConsoleKey.C, Cancel2);
 
 
 
 
-            List<Character> characters3 = new List<Character>();
+            List<Character> characters2 = new List<Character>();
 
             if (File.Exists(path))
             {
-                characters3 = LoadCharactersFromJson();
+                characters2 = LoadCharactersFromJson();
             }
             else
             {
-                characters3 = new List<Character>() {
+                characters2 = new List<Character>() {
                     Character1, Character2, Character3, Character4,
                     Character5, Character6, Character7, Character8
                 };
             }
-            Fight fight3 = new Fight(characters3, ConsoleKey.Escape, Cancel2);
+            Fight fight2 = new Fight(characters2, ConsoleKey.Escape, Cancel2);
 
             List<Fight> fights = new List<Fight>()
             {
-                fight3
+                fight2
             };
 
             FightManager fightManager = new FightManager(fights);
