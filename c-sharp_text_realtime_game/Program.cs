@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using c_sharp_text_realtime_game.Interfaces;
 using Newtonsoft.Json;
 using Formatting = Newtonsoft.Json.Formatting;
 
@@ -12,6 +13,8 @@ namespace c_sharp_text_realtime_game
 {
     class Program
     {
+        public static string path = Path.Combine(Environment.CurrentDirectory, "save.json");
+
         static async Task Main(string[] args)
         {
             Character Character1 = new Zombie("Azouma");
@@ -22,7 +25,6 @@ namespace c_sharp_text_realtime_game
             Character Character6 = new Assassin("Connor");
             Character Character7 = new Alchimist("Singed");
             Character Character8 = new Necromancer("Gromoun");
-
 
             Character Character11 = new Zombie("test11");
             Character Character12 = new Warrior("test12");
@@ -41,16 +43,7 @@ namespace c_sharp_text_realtime_game
             //Character Character16 = new Alchimist("Ivyness");
             //Character Character17 = new Necromancer("Granmerkal");
 
-            //List<Character> Characters = new List<Character>() { Character2, Character12 };
-            /*List<Character> Characters = new List<Character>() {
-                Character1, Character2, Character3, Character4,
-                Character5, Character6, Character7, Character8,
-                Character11, Character12, Character13, Character14,
-                Character15, Character16, Character17
-            };*/
 
-            //FightManager FightManager = new FightManager(Characters);
-            //await FightManager.StartBattleRoyal();
 
             List<Character> characters1 = new List<Character>() {
                 Character1, Character2, Character3, Character4,
@@ -64,20 +57,69 @@ namespace c_sharp_text_realtime_game
 
             CancellationTokenSource Cancel1 = new CancellationTokenSource();
             CancellationTokenSource Cancel2 = new CancellationTokenSource();
-            CancellationTokenSource Cancel3 = new CancellationTokenSource();
 
             Fight fight1 = new Fight(characters1, ConsoleKey.Escape, Cancel1);
-            Fight fight2 = new Fight(characters2, ConsoleKey.V, Cancel2);
+            Fight fight2 = new Fight(characters2, ConsoleKey.C, Cancel2);
+
+
+
+
+            List<Character> characters3 = new List<Character>();
+
+            if (File.Exists(path))
+            {
+                characters3 = LoadCharactersFromJson();
+            }
+            else
+            {
+                characters3 = new List<Character>() {
+                    Character1, Character2, Character3, Character4,
+                    Character5, Character6, Character7, Character8
+                };
+            }
+            Fight fight3 = new Fight(characters3, ConsoleKey.Escape, Cancel2);
 
             List<Fight> fights = new List<Fight>()
             {
-                fight1
+                fight3
             };
 
             FightManager fightManager = new FightManager(fights);
             await fightManager.StartMultipleFight();
         }
 
+        static public List<Character> LoadCharactersFromJson()
+        {
+            List<Character> results = new List<Character>();
+            string data = File.ReadAllText(path);
+
+            List<CharacterData> characters = JsonConvert.DeserializeObject<List<CharacterData>>(data);
+
+            // récup la classe
+            foreach (CharacterData characterData in characters)
+            {
+                if (characterData.CurrentLife > 0)
+                {
+                    Type type = Type.GetType("c_sharp_text_realtime_game." + characterData.Type);
+                    Character character = (Character)Activator.CreateInstance(type, characterData.Name);
+                    character.AttackRate = characterData.AttackRate;
+                    character.DefenseRate = characterData.DefenseRate;
+                    character.AttackSpeed = characterData.AttackSpeed;
+                    character.DamageRate = characterData.DamageRate;
+                    character.MaximumLife = characterData.MaximumLife;
+                    character.CurrentLife = characterData.CurrentLife;
+                    character.PowerSpeed = characterData.PowerSpeed;
+                    character.DelayAttacks = characterData.DelayAttacks;
+                    character.PoisonDamages = characterData.PoisonDamages;
+                    character.IsSpecialSpellAvailable = characterData.IsSpecialSpellAvailable;
+                    character.Color = characterData.Color;
+
+                    results.Add(character);
+                }
+            }
+
+            return results;
+        }
     }
 }
 

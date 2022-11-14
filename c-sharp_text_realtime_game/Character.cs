@@ -13,25 +13,25 @@ namespace c_sharp_text_realtime_game
 
     public class Character
     {
-        public string Name;
-        public int AttackRate;
-        public int DefenseRate;
-        public double AttackSpeed;
-        public int DamageRate;
-        public int MaximumLife;
-        public int CurrentLife;
-        public double PowerSpeed;
-        public ConsoleColor Color { get; set; }
+        [JsonProperty] public string Name;
+        [JsonProperty] public int AttackRate;
+        [JsonProperty] public int DefenseRate;
+        [JsonProperty] public double AttackSpeed;
+        [JsonProperty] public int DamageRate;
+        [JsonProperty] public int MaximumLife;
+        [JsonProperty] public int CurrentLife;
+        [JsonProperty] public double PowerSpeed;
+        [JsonProperty] public ConsoleColor Color { get; set; }
 
         [JsonIgnore] public Random Random;
         [JsonIgnore] public int RandomSeed;
         [JsonIgnore] public Fight Fight;
         protected List<Character> TempCharacters = new List<Character>();
         public event DeathEventHandlerDelegate DeadCharacterEvent;
-        public List<int> DelayAttacks = new List<int>();
+        [JsonProperty] public List<int> DelayAttacks = new List<int>();
         Timer PoisonTimer = new Timer();
-        public List<int> PoisonDamages = new List<int>();
-        public bool IsSpecialSpellAvailable = true;
+        [JsonProperty] public List<int> PoisonDamages = new List<int>();
+        [JsonProperty] public bool IsSpecialSpellAvailable = true;
         Timer SpecialSpellTimer = new Timer();
         public event ReamainingCharactersEventHandlerDelegate ReamainingCharactersEvent;
 

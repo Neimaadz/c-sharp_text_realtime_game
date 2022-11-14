@@ -10,6 +10,7 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace c_sharp_text_realtime_game
 {
@@ -66,12 +67,14 @@ namespace c_sharp_text_realtime_game
             {
                 Console.WriteLine("Fight Cancelled.");
 
-                WriteJsonFile(Characters);
-
+                List<Character> charactersToAdd = new List<Character>();
+                charactersToAdd.AddRange(Characters);
+                WriteJsonFile(charactersToAdd);  // Sauvegarde le jeu
                 return this;
             }
             else
             {
+                File.Delete(Program.path);
                 return this;
             }
         }
@@ -154,12 +157,18 @@ namespace c_sharp_text_realtime_game
 
         static void WriteJsonFile(List<Character> characters)
         {
-            string data = JsonConvert.SerializeObject(characters, Formatting.Indented, new JsonSerializerSettings()
+            List<object> test = new List<object>();
+            foreach (Character character in characters)
+            {
+                JObject jo = JObject.FromObject(character);
+                jo.Add("Type", character.GetType().Name);
+                test.Add(jo);
+            }
+            string data = JsonConvert.SerializeObject(test, Formatting.Indented, new JsonSerializerSettings()
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
-            string path = Path.Combine(Environment.CurrentDirectory, "save.json");
-            File.WriteAllText(path, data);
+            File.WriteAllText(Program.path, data);
         }
 
     }
