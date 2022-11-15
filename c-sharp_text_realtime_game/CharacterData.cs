@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace c_sharp_text_realtime_game.Interfaces
+namespace c_sharp_text_realtime_game
 {
     public class CharacterData
     {
